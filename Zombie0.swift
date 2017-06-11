@@ -9,13 +9,17 @@
 import Foundation
 import SpriteKit
 
-class Zombie0: SKShapeNode {
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+class Zombie0 {
+    static let radius: Int = 5
+    static let shadowOffset: Int = -2
     
-    let shadow = SKShapeNode(circleOfRadius: 5)
+    let shadow = SKShapeNode(circleOfRadius: CGFloat(radius))
     shadow.fillColor = SKColor.black
-    shadow.position = CGPoint(x: 0, y: -2)
-    addChild(shadow)
+    shadow.position = CGPoint(x: 0, y: shadowOffset)
+    self.addChild(shadow)
+    let shape = SKShapeNode(circleOfRadius: CGFloat(radius))
+    shape.fillColor = SKColor.red
+    shape.strokeColor = SKColor.clear
+    shape.position = CGPoint.zero
+    self.addChild(shape)
 }

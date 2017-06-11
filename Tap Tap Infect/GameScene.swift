@@ -12,10 +12,7 @@ import GameplayKit
 class GameScene: SKScene {
     override func didMove(to view: SKView) {
 
-        let shape = SKShapeNode(circleOfRadius: 5)
-        shape.fillColor = SKColor.red
-        shape.strokeColor = SKColor.clear
-        shape.position = CGPoint(x: 0, y: 0)
-        addChild(shape)
+        var zombie: Zombie0!
+
     }
 }
