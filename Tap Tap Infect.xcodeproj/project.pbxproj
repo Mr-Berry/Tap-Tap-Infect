@@ -15,6 +15,7 @@
 		1DDB064E1EECC0B4002B0707 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1DDB064C1EECC0B4002B0707 /* Main.storyboard */; };
 		1DDB06501EECC0B4002B0707 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1DDB064F1EECC0B4002B0707 /* Assets.xcassets */; };
 		1DDB06531EECC0B4002B0707 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1DDB06511EECC0B4002B0707 /* LaunchScreen.storyboard */; };
+		1DDB065E1EECC528002B0707 /* Zombie0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDB065D1EECC528002B0707 /* Zombie0.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		1DDB064F1EECC0B4002B0707 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1DDB06521EECC0B4002B0707 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1DDB06541EECC0B4002B0707 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1DDB065D1EECC528002B0707 /* Zombie0.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Zombie0.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,6 +46,9 @@
 		1DDB06361EECC0B4002B0707 = {
 			isa = PBXGroup;
 			children = (
+				1DDB065C1EECC4C4002B0707 /* Humans */,
+				1DDB065B1EECC4B7002B0707 /* Sounds */,
+				1DDB065A1EECC48A002B0707 /* Zombies */,
 				1DDB06411EECC0B4002B0707 /* Tap Tap Infect */,
 				1DDB06401EECC0B4002B0707 /* Products */,
 			);
@@ -71,6 +76,28 @@
 				1DDB06541EECC0B4002B0707 /* Info.plist */,
 			);
 			path = "Tap Tap Infect";
+			sourceTree = "<group>";
+		};
+		1DDB065A1EECC48A002B0707 /* Zombies */ = {
+			isa = PBXGroup;
+			children = (
+				1DDB065D1EECC528002B0707 /* Zombie0.swift */,
+			);
+			name = Zombies;
+			sourceTree = "<group>";
+		};
+		1DDB065B1EECC4B7002B0707 /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Sounds;
+			sourceTree = "<group>";
+		};
+		1DDB065C1EECC4C4002B0707 /* Humans */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Humans;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -150,6 +177,7 @@
 			files = (
 				1DDB06491EECC0B4002B0707 /* GameScene.swift in Sources */,
 				1DDB064B1EECC0B4002B0707 /* GameViewController.swift in Sources */,
+				1DDB065E1EECC528002B0707 /* Zombie0.swift in Sources */,
 				1DDB06431EECC0B4002B0707 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -316,6 +344,7 @@
 				1DDB06591EECC0B4002B0707 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
