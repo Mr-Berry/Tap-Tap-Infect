@@ -10,16 +10,8 @@ import Foundation
 import SpriteKit
 
 class Zombie0 {
-    static let radius: Int = 5
-    static let shadowOffset: Int = -2
     
-    let shadow = SKShapeNode(circleOfRadius: CGFloat(radius))
-    shadow.fillColor = SKColor.black
-    shadow.position = CGPoint(x: 0, y: shadowOffset)
-    self.addChild(shadow)
-    let shape = SKShapeNode(circleOfRadius: CGFloat(radius))
-    shape.fillColor = SKColor.red
-    shape.strokeColor = SKColor.clear
-    shape.position = CGPoint.zero
-    self.addChild(shape)
+    let health: Int = 3             //three attacks and you are out
+    let speed: Int = 10             //pixels per second
+
 }

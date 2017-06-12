@@ -12,7 +12,7 @@ import GameplayKit
 class GameScene: SKScene {
     override func didMove(to view: SKView) {
 
-        var zombie: Zombie0!
-
+        let human = Human0(color: UIColor.green)
+        human.addChild(scene: self)
     }
 }
