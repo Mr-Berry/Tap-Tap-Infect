@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D721A641EFB33EE00CC6F5C /* TileSets.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1D721A631EFB33EE00CC6F5C /* TileSets.sks */; };
 		1D8FD24A1EF5CA0A00C29815 /* HelperNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FD2491EF5CA0A00C29815 /* HelperNode.swift */; };
 		1D8FD2581EF5CB8100C29815 /* CGFloat+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FD24C1EF5CB8100C29815 /* CGFloat+Extensions.swift */; };
 		1D8FD2591EF5CB8100C29815 /* CGPoint+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FD24D1EF5CB8100C29815 /* CGPoint+Extensions.swift */; };
@@ -21,6 +22,11 @@
 		1D8FD2621EF5CB8100C29815 /* SKTTimingFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FD2561EF5CB8100C29815 /* SKTTimingFunctions.swift */; };
 		1D8FD2631EF5CB8100C29815 /* Vector3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FD2571EF5CB8100C29815 /* Vector3.swift */; };
 		1D8FD2651EF5F39C00C29815 /* Human.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FD2641EF5F39C00C29815 /* Human.swift */; };
+		1DBF7EA41F06FF6E00E8CB83 /* Clouds.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1DBF7EA21F06FF6E00E8CB83 /* Clouds.sks */; };
+		1DBF7EA51F06FF6E00E8CB83 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1DBF7EA31F06FF6E00E8CB83 /* Assets.xcassets */; };
+		1DCE17FB1EFEEF5700554C4A /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCE17FA1EFEEF5700554C4A /* Extensions.swift */; };
+		1DCE17FD1EFEEF6000554C4A /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCE17FC1EFEEF6000554C4A /* Types.swift */; };
+		1DCE17FF1EFF514400554C4A /* HUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCE17FE1EFF514400554C4A /* HUD.swift */; };
 		1DDB06431EECC0B4002B0707 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDB06421EECC0B4002B0707 /* AppDelegate.swift */; };
 		1DDB06451EECC0B4002B0707 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1DDB06441EECC0B4002B0707 /* GameScene.sks */; };
 		1DDB06471EECC0B4002B0707 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1DDB06461EECC0B4002B0707 /* Actions.sks */; };
@@ -29,11 +35,10 @@
 		1DDB064E1EECC0B4002B0707 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1DDB064C1EECC0B4002B0707 /* Main.storyboard */; };
 		1DDB06501EECC0B4002B0707 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1DDB064F1EECC0B4002B0707 /* Assets.xcassets */; };
 		1DDB06531EECC0B4002B0707 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1DDB06511EECC0B4002B0707 /* LaunchScreen.storyboard */; };
-		1DDB065E1EECC528002B0707 /* Zombie0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDB065D1EECC528002B0707 /* Zombie0.swift */; };
-		1DF6683D1EEE11E700FEA71F /* Civilian_Melee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF6683C1EEE11E700FEA71F /* Civilian_Melee.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1D721A631EFB33EE00CC6F5C /* TileSets.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; name = TileSets.sks; path = "Tap Tap Infect/TileSets.sks"; sourceTree = "<group>"; };
 		1D8FD2491EF5CA0A00C29815 /* HelperNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelperNode.swift; sourceTree = "<group>"; };
 		1D8FD24C1EF5CB8100C29815 /* CGFloat+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGFloat+Extensions.swift"; sourceTree = "<group>"; };
 		1D8FD24D1EF5CB8100C29815 /* CGPoint+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGPoint+Extensions.swift"; sourceTree = "<group>"; };
@@ -48,9 +53,14 @@
 		1D8FD2561EF5CB8100C29815 /* SKTTimingFunctions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKTTimingFunctions.swift; sourceTree = "<group>"; };
 		1D8FD2571EF5CB8100C29815 /* Vector3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vector3.swift; sourceTree = "<group>"; };
 		1D8FD2641EF5F39C00C29815 /* Human.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Human.swift; sourceTree = "<group>"; };
+		1DBF7EA21F06FF6E00E8CB83 /* Clouds.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Clouds.sks; sourceTree = "<group>"; };
+		1DBF7EA31F06FF6E00E8CB83 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1DCE17FA1EFEEF5700554C4A /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		1DCE17FC1EFEEF6000554C4A /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
+		1DCE17FE1EFF514400554C4A /* HUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HUD.swift; sourceTree = "<group>"; };
 		1DDB063F1EECC0B4002B0707 /* Tap Tap Infect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tap Tap Infect.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DDB06421EECC0B4002B0707 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		1DDB06441EECC0B4002B0707 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
+		1DDB06441EECC0B4002B0707 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; name = GameScene.sks; path = "Tap Tap Infect/GameScene.sks"; sourceTree = "<group>"; };
 		1DDB06461EECC0B4002B0707 /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
 		1DDB06481EECC0B4002B0707 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		1DDB064A1EECC0B4002B0707 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
@@ -58,8 +68,6 @@
 		1DDB064F1EECC0B4002B0707 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1DDB06521EECC0B4002B0707 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1DDB06541EECC0B4002B0707 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1DDB065D1EECC528002B0707 /* Zombie0.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Zombie0.swift; sourceTree = "<group>"; };
-		1DF6683C1EEE11E700FEA71F /* Civilian_Melee.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Civilian_Melee.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +81,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1D25266C1EFC6E8100E21FE4 /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				1D721A631EFB33EE00CC6F5C /* TileSets.sks */,
+				1DDB06441EECC0B4002B0707 /* GameScene.sks */,
+			);
+			name = Scenes;
+			sourceTree = "<group>";
+		};
 		1D8FD24B1EF5CB8100C29815 /* SKTUtils */ = {
 			isa = PBXGroup;
 			children = (
@@ -92,9 +109,20 @@
 			path = SKTUtils;
 			sourceTree = "<group>";
 		};
+		1DBF7EA11F06FF3900E8CB83 /* Particles */ = {
+			isa = PBXGroup;
+			children = (
+				1DBF7EA21F06FF6E00E8CB83 /* Clouds.sks */,
+				1DBF7EA31F06FF6E00E8CB83 /* Assets.xcassets */,
+			);
+			name = Particles;
+			sourceTree = "<group>";
+		};
 		1DDB06361EECC0B4002B0707 = {
 			isa = PBXGroup;
 			children = (
+				1DBF7EA11F06FF3900E8CB83 /* Particles */,
+				1D25266C1EFC6E8100E21FE4 /* Scenes */,
 				1D8FD24B1EF5CB8100C29815 /* SKTUtils */,
 				1DF6683B1EEE0FC300FEA71F /* Objects */,
 				1DDB065C1EECC4C4002B0707 /* Humans */,
@@ -117,7 +145,7 @@
 			isa = PBXGroup;
 			children = (
 				1DDB06421EECC0B4002B0707 /* AppDelegate.swift */,
-				1DDB06441EECC0B4002B0707 /* GameScene.sks */,
+				1DCE17FE1EFF514400554C4A /* HUD.swift */,
 				1DDB06461EECC0B4002B0707 /* Actions.sks */,
 				1DDB06481EECC0B4002B0707 /* GameScene.swift */,
 				1DDB064A1EECC0B4002B0707 /* GameViewController.swift */,
@@ -125,6 +153,8 @@
 				1DDB064F1EECC0B4002B0707 /* Assets.xcassets */,
 				1DDB06511EECC0B4002B0707 /* LaunchScreen.storyboard */,
 				1DDB06541EECC0B4002B0707 /* Info.plist */,
+				1DCE17FA1EFEEF5700554C4A /* Extensions.swift */,
+				1DCE17FC1EFEEF6000554C4A /* Types.swift */,
 			);
 			path = "Tap Tap Infect";
 			sourceTree = "<group>";
@@ -132,7 +162,6 @@
 		1DDB065A1EECC48A002B0707 /* Zombies */ = {
 			isa = PBXGroup;
 			children = (
-				1DDB065D1EECC528002B0707 /* Zombie0.swift */,
 			);
 			name = Zombies;
 			sourceTree = "<group>";
@@ -148,7 +177,6 @@
 			isa = PBXGroup;
 			children = (
 				1D8FD2641EF5F39C00C29815 /* Human.swift */,
-				1DF6683C1EEE11E700FEA71F /* Civilian_Melee.swift */,
 			);
 			name = Humans;
 			sourceTree = "<group>";
@@ -221,10 +249,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DBF7EA41F06FF6E00E8CB83 /* Clouds.sks in Resources */,
+				1D721A641EFB33EE00CC6F5C /* TileSets.sks in Resources */,
 				1DDB064E1EECC0B4002B0707 /* Main.storyboard in Resources */,
 				1DDB06451EECC0B4002B0707 /* GameScene.sks in Resources */,
 				1DDB06501EECC0B4002B0707 /* Assets.xcassets in Resources */,
 				1DDB06531EECC0B4002B0707 /* LaunchScreen.storyboard in Resources */,
+				1DBF7EA51F06FF6E00E8CB83 /* Assets.xcassets in Resources */,
 				1DDB06471EECC0B4002B0707 /* Actions.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -239,20 +270,21 @@
 				1DDB06491EECC0B4002B0707 /* GameScene.swift in Sources */,
 				1D8FD2621EF5CB8100C29815 /* SKTTimingFunctions.swift in Sources */,
 				1D8FD24A1EF5CA0A00C29815 /* HelperNode.swift in Sources */,
+				1DCE17FD1EFEEF6000554C4A /* Types.swift in Sources */,
 				1D8FD25A1EF5CB8100C29815 /* CGVector+Extensions.swift in Sources */,
 				1D8FD2591EF5CB8100C29815 /* CGPoint+Extensions.swift in Sources */,
 				1D8FD2581EF5CB8100C29815 /* CGFloat+Extensions.swift in Sources */,
 				1DDB064B1EECC0B4002B0707 /* GameViewController.swift in Sources */,
+				1DCE17FB1EFEEF5700554C4A /* Extensions.swift in Sources */,
 				1D8FD2651EF5F39C00C29815 /* Human.swift in Sources */,
 				1D8FD2601EF5CB8100C29815 /* SKTAudio.swift in Sources */,
-				1DF6683D1EEE11E700FEA71F /* Civilian_Melee.swift in Sources */,
 				1D8FD25F1EF5CB8100C29815 /* SKNode+Extensions.swift in Sources */,
 				1D8FD25C1EF5CB8100C29815 /* SKAction+Extensions.swift in Sources */,
 				1D8FD25D1EF5CB8100C29815 /* SKAction+SpecialEffects.swift in Sources */,
-				1DDB065E1EECC528002B0707 /* Zombie0.swift in Sources */,
 				1DDB06431EECC0B4002B0707 /* AppDelegate.swift in Sources */,
 				1D8FD2611EF5CB8100C29815 /* SKTEffects.swift in Sources */,
 				1D8FD25B1EF5CB8100C29815 /* Int+Extensions.swift in Sources */,
+				1DCE17FF1EFF514400554C4A /* HUD.swift in Sources */,
 				1D8FD2631EF5CB8100C29815 /* Vector3.swift in Sources */,
 				1D8FD25E1EF5CB8100C29815 /* SKColor+Extensions.swift in Sources */,
 			);
