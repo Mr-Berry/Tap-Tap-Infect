@@ -12,12 +12,17 @@ import UIKit
 
 class GameScene: SKScene {
     
+    var cameraNode = SKCameraNode()
+    
     var HumanPop: [Human] = []
     var ZombiePop: [Human] = []
     
     var background: SKTileMapNode!
     var obstaclesTileMap: SKTileMapNode!
     var buildingsTileMap: SKTileMapNode!
+    
+    let cameraMoveSpeed = 20.0
+    var initialTouch: CGPoint = CGPoint()
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -27,6 +32,8 @@ class GameScene: SKScene {
     }
     
     override func didMove(to view: SKView) {
+        
+        setupCamera()
 
         HumanPop.append(Human(category: humanType.civilian.rawValue, type: attackType.ranged.rawValue))
         HumanPop.append(Human(category: humanType.civilian.rawValue, type: attackType.melee.rawValue))
@@ -37,8 +44,45 @@ class GameScene: SKScene {
         setupObstaclePhysics()
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else {
+            return
+        }
+        initialTouch = touch.location(in: self)
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        for touch in touches {
+            let location = touch.location(in: cameraNode)
+            let offset = initialTouch - location
+            let direction = offset/offset.length()
+            let vector = CGVector(dx: direction.x*CGFloat(cameraMoveSpeed),
+                                  dy: -1*direction.y*CGFloat(cameraMoveSpeed))
+
+            camera!.run(SKAction.sequence([SKAction.move(by: vector, duration: 0.1)]))
+            initialTouch = location
+        }
+    }
+    
     override func update(_ currentTime: TimeInterval) {
         
+    }
+    
+    func setupCamera() {
+        guard let camera = camera, let view = view else { return }
+        
+        let xInset = min(view.bounds.width*0.7*camera.xScale, background.frame.width)
+        let yInset = min(view.bounds.height*0.66*camera.yScale, background.frame.height)
+        
+        let constraintRect = background.frame.insetBy(dx: xInset, dy: yInset)
+        
+        let xRange = SKRange(lowerLimit: constraintRect.minX, upperLimit: constraintRect.maxX)
+        let yRange = SKRange(lowerLimit: constraintRect.minY, upperLimit: constraintRect.maxY)
+        
+        let edgeConstraint = SKConstraint.positionX(xRange, y: yRange)
+        edgeConstraint.referenceNode = background
+        
+        camera.constraints = [edgeConstraint]
     }
     
     func setupEdgeLoop() -> SKPhysicsBody {
