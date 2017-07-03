@@ -10,7 +10,19 @@ import SpriteKit
 import GameplayKit
 import UIKit
 
-class GameScene: SKScene {
+struct PhysicsCategory {
+    static let None: UInt32                         = 0
+    static let Civilian: UInt32                     = 0b1
+    static let Cop: UInt32                          = 0b10
+    static let Military: UInt32                     = 0b100
+    static let Zombie: UInt32                       = 0b1000
+    static let obstacle: UInt32                     = 0b10000
+}
+
+class GameScene: SKScene, SKPhysicsContactDelegate {
+    
+    var lastUpdateTimeInterval: TimeInterval = 0
+    var deltaTime: TimeInterval = 0
     
     var cameraNode = SKCameraNode()
     var humansCount: Int = 0
@@ -25,7 +37,7 @@ class GameScene: SKScene {
     
     var numZTaps: Int = 1
     var unlockedSpawns: Int = 1
-    let cameraMoveSpeed:Float = 20.0
+    let cameraMoveSpeed: Float = 20.0
     var initialTouch: CGPoint = .zero
     var endTouch: CGPoint = .zero
     var spawnPoints: [CGPoint] = []
@@ -35,6 +47,7 @@ class GameScene: SKScene {
     }
     
     override func didMove(to view: SKView) {
+        physicsWorld.contactDelegate = self
         setupEmitters()
         setupBuildingPhysics()
         setupObstaclePhysics()
@@ -70,6 +83,12 @@ class GameScene: SKScene {
     }
     
     override func update(_ currentTime: TimeInterval) {
+        if lastUpdateTimeInterval > 0 {
+            deltaTime = currentTime - lastUpdateTimeInterval
+        } else {
+            deltaTime = 0
+        }
+        lastUpdateTimeInterval = currentTime
         setHumanSpawner()
         tapZombie()
         updateHumansAndZombies()
@@ -105,6 +124,19 @@ class GameScene: SKScene {
         for i in 0...HumanSettings.humanStartPop-1 {
             spawnHuman(human: HumanPop[i])
         }
+    }
+    
+    func didBegin(_ contact: SKPhysicsContact) {
+        if contact.bodyA.categoryBitMask == PhysicsCategory.Zombie || contact.bodyB.categoryBitMask == PhysicsCategory.Zombie{
+            let other = contact.bodyA.categoryBitMask == PhysicsCategory.Zombie ? contact.bodyB : contact.bodyA
+            switch other.categoryBitMask {
+            case PhysicsCategory.Zombie:
+                print("Rawr")
+            default:
+                break
+            }
+        }
+
     }
     
     func setHumanSpawner() {
@@ -237,14 +269,21 @@ class GameScene: SKScene {
     }
     
     func updateHumansAndZombies() {
+        var target: Human?
         for zombie in ZombiePop{
             for human in HumanPop {
-                if zombie.range.contains(human.shape.position){
-                    human.beingChased = true
+                if zombie.maxRange > (zombie.shape.position - human.shape.position).length(){
                     human.runAway(zombiePosition: zombie.shape.position)
-                } else {
-                    human.walk()
+                    if zombie.closestHuman == 0 || (zombie.closestHuman >= (zombie.shape.position - human.shape.position).length()) {
+                        zombie.closestHuman = (zombie.shape.position-human.shape.position).length()
+                        target = human
+                    }
                 }
+            }
+            if target != nil {
+                zombie.chase(human: target!)
+            } else {
+                zombie.closestHuman = 0
             }
         }
     }

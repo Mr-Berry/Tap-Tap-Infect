@@ -30,9 +30,10 @@ class Human {
     var healthMax: Int = 0
     var speed: CGFloat = 0
     var radius: Int = 0
+    var maxRange: CGFloat = 0
     var category: Int = 0
     var type: Int = 0
-    var closestHuman: Int = 0
+    var closestHuman: CGFloat = 0
     
     var isAlive: Bool = true
     var canTurn: Bool = true
@@ -48,9 +49,9 @@ class Human {
     init(category: Int, type: Int) {
         setHealth(category: category, type: type)
         setRadius()
-        setRange()
-        speed = CGFloat(50/health)
+        speed = CGFloat(40/health)
         shape = initShape(category: category)
+        setRange()
         self.category = category
         self.type = type
     }
@@ -65,21 +66,45 @@ class Human {
     
     func becomeZombie() {
         shape.fillColor = .red
+        isAlive = false
+    }
+    
+    func chase(human: Human) {
+        shape.removeAction(forKey: "walk")
+        if shape.action(forKey: "chase") == nil {
+            let offset = human.shape.position - shape.position
+            let direction = offset/offset.length()
+            let vector = CGVector(dx: 2*direction.x*speed, dy: 2*direction.y*speed)
+            let chase = SKAction.move(by: vector, duration: 1)
+            let clean = SKAction.run { self.shape.removeAllActions() }
+            shape.run(SKAction.sequence([chase,clean,SKAction.run{ self.walk() }]), withKey: "chase")
+        }
+    }
+    
+    func flash(color: CIColor) {
+        let o_color = shape.fillColor
+        let midBrightness = SKAction.run {
+            self.shape.fillColor = UIColor(ciColor: CIColor(red: color.red*0.5, green: color.green*0.5, blue: color.blue*0.5))
+        }
+        let maxBrightness = SKAction.run { self.shape.fillColor = UIColor(ciColor: color) }
+        let original = SKAction.run { self.shape.fillColor = o_color }
+        let wait = SKAction.wait(forDuration: 0.25)
+        shape.run(SKAction.sequence([wait,midBrightness,wait,maxBrightness,wait,midBrightness,wait,original]))
     }
     
     func initShape(category: Int) -> SKShapeNode {
         let shape = SKShapeNode(circleOfRadius: CGFloat(radius))
         switch category {
         case humanType.cop.rawValue:
-            shape.fillColor = SKColor.blue
+            shape.fillColor = .blue
             shape.strokeColor = #colorLiteral(red: 0.09019608051, green: 0, blue: 0.3019607961, alpha: 1)
             break
         case humanType.military.rawValue:
-            shape.fillColor = SKColor.green
+            shape.fillColor = .green
             shape.strokeColor = #colorLiteral(red: 0.1960784346, green: 0.3411764801, blue: 0.1019607857, alpha: 1)
             break
         default:
-            shape.fillColor = SKColor.white
+            shape.fillColor = .white
             shape.strokeColor = #colorLiteral(red: 0.2549019754, green: 0.2745098174, blue: 0.3019607961, alpha: 1)
             break
         }
@@ -100,14 +125,14 @@ class Human {
     
     func runAway(zombiePosition: CGPoint) {
         shape.removeAction(forKey: "walk")
-        if shape.action(forKey: "runAway") == nil && beingChased{
-            let offset = shape.position - zombiePosition
+        if shape.action(forKey: "runAway") == nil{
+            let offset = zombiePosition - shape.position
             let direction = offset/offset.length()
             let vector = CGVector(dx: -2*direction.x*speed,
                                   dy: -2*direction.y*speed)
-            let run = SKAction.move(by: vector, duration: 3)
-            shape.run(SKAction.sequence([run,SKAction.removeFromParent()]), withKey: "runAway")
-            beingChased = false
+            let run = SKAction.move(by: vector, duration: 1)
+            let clean = SKAction.run { self.shape.removeAllActions() }
+            shape.run(SKAction.sequence([run,clean,SKAction.run{ self.walk() }]), withKey: "runAway")
         }
     }
     
@@ -154,14 +179,19 @@ class Human {
     }
     
     func setRange() {
-        range = SKShapeNode(circleOfRadius: CGFloat(5*radius))
+        maxRange = CGFloat(15*radius)
+        range = SKShapeNode(circleOfRadius: maxRange)
         range.strokeColor = .black
         range.fillColor = .clear
-        range.position = .zero
         shape.addChild(range)
     }
     
     func takeDamage(_ damage: Int) {
+        if isAlive {
+            flash(color: CIColor(red: 255, green: 0, blue: 0))
+        } else {
+            flash(color: CIColor(red: 0, green: 0, blue: 0))
+        }
         health -= damage
         if health <= -healthMax {
             canTurn = false
@@ -172,11 +202,17 @@ class Human {
         }
     }
     
+    func updateHuman() {
+        if beingChased && !shape.hasActions(){
+            beingChased = false
+            walk()
+        }
+    }
+    
     func walk() {
-        shape.removeAllActions()
         let direction = CGPoint(x: Int.random(min: -1, max: 1), y: Int.random(min: -1, max: 1))
         let vector = CGVector(dx: direction.x*CGFloat(speed), dy: direction.y*CGFloat(speed))
-        let moveBy = SKAction.move(by: vector, duration: 3)
+        let moveBy = SKAction.move(by: vector, duration: 5)
         let moveAgain = SKAction.run(walk)
         shape.run(SKAction.sequence([moveBy, moveAgain]), withKey: "walk")
     }
