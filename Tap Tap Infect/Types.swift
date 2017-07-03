@@ -14,7 +14,7 @@ public enum humanType: Int {
 }
 
 public enum attackType: Int {
-    case melee = 0, ranged, boss
+    case melee = 0, ranged
 }
 
 typealias TileCoordinates = (column: Int, row: Int)

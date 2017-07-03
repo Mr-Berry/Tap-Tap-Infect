@@ -13,35 +13,33 @@ import UIKit
 class GameScene: SKScene {
     
     var cameraNode = SKCameraNode()
-    
+    var humansCount: Int = 0
+    var zombieCount: Int = 0
     var HumanPop: [Human] = []
     var ZombiePop: [Human] = []
     
     var background: SKTileMapNode!
     var obstaclesTileMap: SKTileMapNode!
-    var buildingsTileMap: SKTileMapNode!
+    var buildingsTileMap: [SKTileMapNode] = []
+    var clouds: SKTileMapNode!
     
-    let cameraMoveSpeed = 20.0
-    var initialTouch: CGPoint = CGPoint()
+    var numZTaps: Int = 1
+    var unlockedSpawns: Int = 1
+    let cameraMoveSpeed:Float = 20.0
+    var initialTouch: CGPoint = .zero
+    var endTouch: CGPoint = .zero
+    var spawnPoints: [CGPoint] = []
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        background = childNode(withName: "environment") as! SKTileMapNode
-        obstaclesTileMap = childNode(withName: "obstacles") as! SKTileMapNode
-        buildingsTileMap = childNode(withName: "buildings") as! SKTileMapNode
     }
     
     override func didMove(to view: SKView) {
-        
-        setupCamera()
-
-        HumanPop.append(Human(category: humanType.civilian.rawValue, type: attackType.ranged.rawValue))
-        HumanPop.append(Human(category: humanType.civilian.rawValue, type: attackType.melee.rawValue))
-        HumanPop.append(Human(category: humanType.civilian.rawValue, type: attackType.boss.rawValue))
-        for index in 0...(HumanPop.endIndex-1) {
-            HumanPop[index].addChild(scene: self)
-        }
+        setupEmitters()
+        setupBuildingPhysics()
         setupObstaclePhysics()
+        setupCamera()
+        createHumans()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -64,77 +62,168 @@ class GameScene: SKScene {
         }
     }
     
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else {
+            return
+        }
+        endTouch = touch.location(in: self)
+    }
+    
     override func update(_ currentTime: TimeInterval) {
-        
+        setHumanSpawner()
+        tapZombie()
+        updateHumansAndZombies()
     }
     
-    func setupCamera() {
-        guard let camera = camera, let view = view else { return }
-        
-        let xInset = min(view.bounds.width*0.7*camera.xScale, background.frame.width)
-        let yInset = min(view.bounds.height*0.66*camera.yScale, background.frame.height)
-        
-        let constraintRect = background.frame.insetBy(dx: xInset, dy: yInset)
-        
-        let xRange = SKRange(lowerLimit: constraintRect.minX, upperLimit: constraintRect.maxX)
-        let yRange = SKRange(lowerLimit: constraintRect.minY, upperLimit: constraintRect.maxY)
-        
-        let edgeConstraint = SKConstraint.positionX(xRange, y: yRange)
-        edgeConstraint.referenceNode = background
-        
-        camera.constraints = [edgeConstraint]
+    func createHumans() {
+        for i in 0...HumanSettings.humanMaxPop-1 {
+            let chance = Int.random(min: 1, max: 100)
+            if chance <= HumanSettings.militaryChance {
+                HumanPop.insert(Human(category: humanType.military.rawValue,
+                                      type: attackType.ranged.rawValue), at: i)
+            } else if chance <= (HumanSettings.copChance + HumanSettings.militaryChance) {
+                if Int.random(min: 1, max: 100) <= 25 {
+                    HumanPop.insert(Human(category: humanType.cop.rawValue,
+                                          type: attackType.ranged.rawValue), at: i)
+                } else {
+                    HumanPop.insert(Human(category: humanType.cop.rawValue,
+                                          type: attackType.melee.rawValue), at: i)
+                }
+            } else {
+                if Int.random(min: 1, max: 100) <= 25 {
+                    HumanPop.insert(Human(category: humanType.civilian.rawValue,
+                                          type: attackType.ranged.rawValue), at: i)
+                } else {
+                    HumanPop.insert(Human(category: humanType.civilian.rawValue,
+                                          type: attackType.melee.rawValue), at: i)
+                }
+            }
+            HumanPop[i].addChild(scene: self)
+            HumanPop[i].shape.position = CGPoint(x: background.frame.size.width,
+                                                 y: background.frame.size.height)
+        }
+        for i in 0...HumanSettings.humanStartPop-1 {
+            spawnHuman(human: HumanPop[i])
+        }
     }
     
-    func setupEdgeLoop() -> SKPhysicsBody {
-        var physicsBodies: [SKPhysicsBody] = []
-        let edgeLoop = SKPhysicsBody(bodies: physicsBodies)
-        return edgeLoop
+    func setHumanSpawner() {
+        let spawnAction = SKAction.sequence([
+            SKAction.wait(forDuration: TimeInterval(HumanSettings.spawnFreq)),
+            SKAction.run{ self.spawnHuman(human: self.HumanPop[self.humansCount])},
+            SKAction.removeFromParent()])
+        if self.action(forKey: "spawn") == nil &&
+            (humansCount+zombieCount) < HumanSettings.humanMaxPop {
+            run(spawnAction, withKey: "spawn")
+        }
     }
     
-    func setupObstaclePhysics() {
-        
-        guard let buildingsTileMap = buildingsTileMap else { return }
-        for row in 0..<buildingsTileMap.numberOfRows {
-            for column in 0..<buildingsTileMap.numberOfColumns {
-                if let tile2 = tile(in: buildingsTileMap, at: (column,row)) {
-                    //check if it is the bottom left tile of building
-                    if (tile(in: buildingsTileMap, at: (column-1, row)) == nil &&
-                        tile(in: buildingsTileMap, at: (column, row-1)) == nil) {
-                        //count how many nodes are above one another
-                        var numInAColumn = 1
-                        var i = row + 1
-                        while tile(in: buildingsTileMap, at: (column,i)) != nil {
-                            numInAColumn += 1
-                            i += 1
+    func setupBuildings() {
+        let buildings = childNode(withName: "buildings")!
+        buildings.enumerateChildNodes(withName: "*", using: {(node,stop) in
+            let building = node as! SKTileMapNode
+            self.buildingsTileMap.append(building)
+        })
+    }
+    
+    func setupBuildingPhysics() {
+        setupBuildings()
+        for building in buildingsTileMap {
+            let decorationNode = building.childNode(withName: "buildingdeco") as! SKTileMapNode
+            for row in 0..<building.numberOfRows {
+                for column in 0..<building.numberOfColumns {
+                    if let tile = tile(in: building, at: (column,row)) {
+                        let node = SKNode()
+                        node.position = building.centerOfTile(atColumn: column, row: row)
+                        node.physicsBody = SKPhysicsBody(rectangleOf: tile.size)
+                        node.physicsBody?.isDynamic = false
+                        building.addChild(node)
+                    }
+                    if let tile1 = tile(in: decorationNode, at: (column,row)) {
+                        if tile1.name == "door" {
+                            var point = decorationNode.centerOfTile(atColumn: column, row: row)
+                            point.y -= 0.5*tile1.size.height
+                            let spawnPoint = convert(point, from: decorationNode)
+                            self.spawnPoints.append(spawnPoint)
                         }
-                        //count how many nodes are next to one another
-                        var numInARow = 1
-                        var j = column + 1
-                        while tile(in: buildingsTileMap, at: (j,row)) != nil {
-                            numInARow += 1
-                            j += 1
-                        }
-                        let building = SKNode()
-                        let size = CGSize(width: numInARow*Int(tile2.size.width), height: numInAColumn*Int(tile2.size.height))
-                        let center = buildingsTileMap.centerOfTile(atColumn: column, row: row)
-                        let anchorPoint = CGPoint(x: center.x-0.5*tile2.size.width,
-                                                  y: center.y-0.5*tile2.size.height)
-                        
-                        building.physicsBody = SKPhysicsBody(rectangleOf: size)
-                        building.physicsBody?.isDynamic = false
-                        building.physicsBody?.friction = 0
-                        building.position = CGPoint(
-                            x: anchorPoint.x + CGFloat(0.5*size.width),
-                            y: anchorPoint.y + CGFloat(0.5*size.height))
-                        buildingsTileMap.addChild(building)
                     }
                 }
             }
         }
     }
     
-    private func spawnHuman() {
+    func setupObstaclePhysics() {
+        obstaclesTileMap = childNode(withName: "obstacles") as! SKTileMapNode
+        for row in 0..<obstaclesTileMap.numberOfRows {
+            for column in 0..<obstaclesTileMap.numberOfColumns {
+                if let tile = tile(in: obstaclesTileMap, at: (column,row)) {
+                    let node = SKNode()
+                    node.position = obstaclesTileMap.centerOfTile(atColumn: column, row: row)
+                    node.position.y -= 0.25*tile.size.height
+                    node.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: tile.size.width,
+                                                                        height: tile.size.height*0.5))
+                    node.physicsBody?.isDynamic = false
+                    obstaclesTileMap.addChild(node)
+                }
+            }
+        }
+    }
+    
+    func setupCamera() {
+        guard let camera = camera, let view = view else { return }
         
+        let xInset = min(view.bounds.width*0.5*camera.xScale, obstaclesTileMap.frame.width*0.5)
+        let yInset = min(view.bounds.height*0.5*camera.yScale, obstaclesTileMap.frame.height*0.5)
+        
+        let constraintRect = obstaclesTileMap.frame.insetBy(dx: xInset, dy: yInset)
+        
+        let xRange = SKRange(lowerLimit: constraintRect.minX, upperLimit: constraintRect.maxX)
+        let yRange = SKRange(lowerLimit: constraintRect.minY, upperLimit: constraintRect.maxY)
+        
+        let edgeConstraint = SKConstraint.positionX(xRange, y: yRange)
+        edgeConstraint.referenceNode = obstaclesTileMap
+        
+        camera.constraints = [edgeConstraint]
+    }
+    
+    func setupEdgeLoop() {
+
+    }
+    
+    func setupEmitters() {
+        background = childNode(withName: "environment") as! SKTileMapNode
+        background.enumerateChildNodes(withName: "*", using: { (node, stop) in
+            let cloud = node as! SKEmitterNode
+            cloud.advanceSimulationTime(50)
+        })
+    }
+    
+    func spawnHuman(human: Human) {
+        let spawnPoint = spawnPoints[Int.random(min: 0, max: unlockedSpawns)]
+        let move = SKAction.move(to: spawnPoint, duration: 0)
+        let recolor = SKAction.fadeAlpha(to: 1, duration: 2.0)
+        let spawnAction = SKAction.sequence([move,recolor,SKAction.run{human.walk()}])
+        human.shape.run(spawnAction)
+        humansCount += 1
+    }
+    
+    func tapZombie() {
+        if numZTaps > 0 && initialTouch != .zero{
+            var index: Int = -1
+            for i in 0...HumanPop.count-1 {
+                if HumanPop[i].shape.contains(initialTouch) && HumanPop[i].shape.contains(endTouch){
+                    HumanPop[i].becomeZombie()
+                    ZombiePop.append(HumanPop[i])
+                    zombieCount += 1
+                    numZTaps -= 1
+                    index = i
+                }
+            }
+            if index >= 0 {
+                HumanPop.remove(at: index)
+                humansCount -= 1
+            }
+        }
     }
     
     func tile(in tileMap: SKTileMapNode, at coordinates: TileCoordinates) -> SKTileDefinition? {
@@ -145,5 +234,18 @@ class GameScene: SKScene {
         let column = tileMap.tileColumnIndex(fromPosition: position)
         let row = tileMap.tileRowIndex(fromPosition: position)
         return(column, row)
+    }
+    
+    func updateHumansAndZombies() {
+        for zombie in ZombiePop{
+            for human in HumanPop {
+                if zombie.range.contains(human.shape.position){
+                    human.beingChased = true
+                    human.runAway(zombiePosition: zombie.shape.position)
+                } else {
+                    human.walk()
+                }
+            }
+        }
     }
 }

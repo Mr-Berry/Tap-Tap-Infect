@@ -10,46 +10,36 @@ import Foundation
 import SpriteKit
 
 enum HumanSettings {
-    static let minRadius: Int = 8
-    static let maxRadius: Int = 16
-    static let turnTime: Int = 5
-    static var numTapped: Int = 0
+    static var attackRate: Int = 2
+    static var humanMaxPop: Int = 10
+    static var humanStartPop: Int = 3
+    static var copChance: Int = 10
+    static var militaryChance: Int = 0
+    static let minRadius: Int = 6
+    static let maxRadius: Int = 10
     static var maxTap: Int = 1
+    static var numTapped: Int = 0
+    static var spawnFreq: Int = 10
+    static let turnTime: Int = 5
 }
 
 class Human {
     
+    var damage: Int = 0
     var health: Int = 0
     var healthMax: Int = 0
-    var speed: Int = 0
+    var speed: CGFloat = 0
     var radius: Int = 0
     var category: Int = 0
     var type: Int = 0
+    var closestHuman: Int = 0
     
     var isAlive: Bool = true
     var canTurn: Bool = true
     var beingChased: Bool = false
     
     var shape: SKShapeNode = SKShapeNode()
-    
-    var starPath: CGPath = {
-        let bezierPath = UIBezierPath()
-        
-        bezierPath.move(to: CGPoint(x: 0, y: 4))
-        bezierPath.addLine(to: CGPoint(x: 0.88,y: 1.21))
-        bezierPath.addLine(to: CGPoint(x: 3.8, y: 1.24))
-        bezierPath.addLine(to: CGPoint(x: 1.43, y: -0.46))
-        bezierPath.addLine(to: CGPoint(x: 2.35, y: -3.24))
-        bezierPath.addLine(to: CGPoint(x: 0, y: -1.5))
-        bezierPath.addLine(to: CGPoint(x: -2.35, y: -3.24))
-        bezierPath.addLine(to: CGPoint(x: -1.43, y: -0.46))
-        bezierPath.addLine(to: CGPoint(x: -3.8, y: 1.24))
-        bezierPath.addLine(to: CGPoint(x: -0.88, y: 1.21))
-        bezierPath.addLine(to: CGPoint(x: 0, y: 4))
-        bezierPath.close()
-        
-        return bezierPath.cgPath
-    }()
+    var range: SKShapeNode = SKShapeNode()
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -58,11 +48,23 @@ class Human {
     init(category: Int, type: Int) {
         setHealth(category: category, type: type)
         setRadius()
-        speed = 50/health
+        setRange()
+        speed = CGFloat(50/health)
         shape = initShape(category: category)
         self.category = category
         self.type = type
-        walk()
+    }
+    
+    func addChild(scene: SKScene) {
+        scene.addChild(shape)
+    }
+    
+    func attack(human: Human) {
+        human.takeDamage(damage)
+    }
+    
+    func becomeZombie() {
+        shape.fillColor = .red
     }
     
     func initShape(category: Int) -> SKShapeNode {
@@ -82,6 +84,8 @@ class Human {
             break
         }
         shape.position = CGPoint.zero
+        shape.zPosition = 5
+        shape.alpha = 0
         shape.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(radius))
         shape.physicsBody?.restitution = 0
         shape.physicsBody?.linearDamping = 0.5
@@ -90,47 +94,24 @@ class Human {
         return shape
     }
     
-    func addChild(scene: SKScene) {
-        scene.addChild(shape)
-    }
-    
-    private func attack() {
-        
-    }
-    
     func position(position: CGPoint) {
         shape.position = position
     }
     
-    func move(zombiePosition: CGPoint) {
-        shape.removeAllActions()
-        switch category {
-        case humanType.civilian.rawValue:
-            runAway(zombiePosition: zombiePosition)
-            break
-        default:
-            attack()
-            break
+    func runAway(zombiePosition: CGPoint) {
+        shape.removeAction(forKey: "walk")
+        if shape.action(forKey: "runAway") == nil && beingChased{
+            let offset = shape.position - zombiePosition
+            let direction = offset/offset.length()
+            let vector = CGVector(dx: -2*direction.x*speed,
+                                  dy: -2*direction.y*speed)
+            let run = SKAction.move(by: vector, duration: 3)
+            shape.run(SKAction.sequence([run,SKAction.removeFromParent()]), withKey: "runAway")
+            beingChased = false
         }
     }
     
-    func walk() {
-        let direction = CGPoint(x: Int.random(min: -1, max: 1), y: Int.random(min: -1, max: 1))
-        let vector = CGVector(dx: direction.x*CGFloat(speed), dy: direction.y*CGFloat(speed))
-        let moveBy = SKAction.move(by: vector, duration: 3)
-        let moveAgain = SKAction.run(walk)
-        shape.run(SKAction.sequence([moveBy, moveAgain]))
-    }
-    
-    func enterHouse() {
-        
-    }
-    
-    private func runAway(zombiePosition: CGPoint) {
-        
-    }
-    
-    private func setHealth(category: Int, type: Int) {
+    func setHealth(category: Int, type: Int) {
         
         switch category {
         case humanType.cop.rawValue:
@@ -139,56 +120,30 @@ class Human {
                 let healthMin = 3
                 healthMax = 6
                 health = Int.random(min: healthMin, max: healthMax)
-                break
-            case attackType.boss.rawValue:
-                let healthMin = 6
-                healthMax = 12
-                health = Int.random(min: healthMin, max: healthMax)
-                break
             default:
                 let healthMin = 4
                 healthMax = 7
                 health = Int.random(min: healthMin, max: healthMax)
-                break
             }
-            break
         case humanType.military.rawValue:
-            switch type {
-            case attackType.boss.rawValue:
-                let healthMin = 8
-                healthMax = 15
-                health = Int.random(min: healthMin, max: healthMax)
-                break
-            default:
-                let healthMin = 4
-                healthMax = 7
-                health = Int.random(min: healthMin, max: healthMax)
-                break
-            }
-            break
+            let healthMin = 4
+            healthMax = 7
+            health = Int.random(min: healthMin, max: healthMax)
         default:
             switch type {
             case attackType.ranged.rawValue:
                 let healthMin = 1
                 healthMax = 2
                 health = Int.random(min: healthMin, max: healthMax)
-                break
-            case attackType.boss.rawValue:
-                let healthMin = 5
-                healthMax = 9
-                health = Int.random(min: healthMin, max: healthMax)
-                break
             default:
                 let healthMin = 2
                 healthMax = 4
                 health = Int.random(min: healthMin, max: healthMax)
-                break
             }
-            break
         }
     }
     
-    private func setRadius() {
+    func setRadius() {
         if 3*health > HumanSettings.maxRadius {
             radius = HumanSettings.maxRadius
         } else if 3*health < HumanSettings.minRadius {
@@ -198,7 +153,15 @@ class Human {
         }
     }
     
-    func takeDamage(damage: Int) {
+    func setRange() {
+        range = SKShapeNode(circleOfRadius: CGFloat(5*radius))
+        range.strokeColor = .black
+        range.fillColor = .clear
+        range.position = .zero
+        shape.addChild(range)
+    }
+    
+    func takeDamage(_ damage: Int) {
         health -= damage
         if health <= -healthMax {
             canTurn = false
@@ -209,7 +172,12 @@ class Human {
         }
     }
     
-    func becomeZombie() {
-        
+    func walk() {
+        shape.removeAllActions()
+        let direction = CGPoint(x: Int.random(min: -1, max: 1), y: Int.random(min: -1, max: 1))
+        let vector = CGVector(dx: direction.x*CGFloat(speed), dy: direction.y*CGFloat(speed))
+        let moveBy = SKAction.move(by: vector, duration: 3)
+        let moveAgain = SKAction.run(walk)
+        shape.run(SKAction.sequence([moveBy, moveAgain]), withKey: "walk")
     }
 }
