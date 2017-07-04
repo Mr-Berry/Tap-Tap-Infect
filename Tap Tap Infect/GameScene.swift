@@ -10,16 +10,14 @@ import SpriteKit
 import GameplayKit
 import UIKit
 
-struct PhysicsCategory {
-    static let None: UInt32                         = 0
-    static let Civilian: UInt32                     = 0b1
-    static let Cop: UInt32                          = 0b10
-    static let Military: UInt32                     = 0b100
-    static let Zombie: UInt32                       = 0b1000
-    static let obstacle: UInt32                     = 0b10000
+enum Upgrades {
+    static var upgrade1: Int = 0
+    static var upgrade2: Int = 0
+    static var upgrade3: Int = 0
+    static var restarts: Int = 0
 }
 
-class GameScene: SKScene, SKPhysicsContactDelegate {
+class GameScene: SKScene {
     
     var lastUpdateTimeInterval: TimeInterval = 0
     var deltaTime: TimeInterval = 0
@@ -27,15 +25,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var cameraNode = SKCameraNode()
     var humansCount: Int = 0
     var zombieCount: Int = 0
+    var destroyedCount: Int = 0
+    var brains: Int = 0
+    
     var HumanPop: [Human] = []
     var ZombiePop: [Human] = []
+    
+    var hud: HUD?
     
     var background: SKTileMapNode!
     var obstaclesTileMap: SKTileMapNode!
     var buildingsTileMap: [SKTileMapNode] = []
     var clouds: SKTileMapNode!
     
-    var numZTaps: Int = 1
+    var numZTaps: Int = 5
     var unlockedSpawns: Int = 1
     let cameraMoveSpeed: Float = 20.0
     var initialTouch: CGPoint = .zero
@@ -44,14 +47,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+        
     }
     
     override func didMove(to view: SKView) {
-        physicsWorld.contactDelegate = self
         setupEmitters()
         setupBuildingPhysics()
         setupObstaclePhysics()
-        setupCamera()
+        setupEdgeLoop()
+        setupHudAndCamera()
         createHumans()
     }
     
@@ -92,6 +96,55 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         setHumanSpawner()
         tapZombie()
         updateHumansAndZombies()
+        cleanUp()
+    }
+    
+    func cleanUp() {
+        var indicesToClean: [Int] = []
+        var indicesToSwap: [Int] = []
+        if !HumanPop.isEmpty {
+            for i in 0...HumanPop.count-1 {
+                if !HumanPop[i].isAlive && !HumanPop[i].canTurn {
+                    indicesToClean.append(i)
+                } else if HumanPop[i].isAlive && !HumanPop[i].canTurn {
+                    indicesToSwap.append(i)
+                }
+            }
+        }
+        if !indicesToClean.isEmpty {
+            for i in 0...indicesToClean.count-1 {
+                let human = HumanPop[indicesToClean[i]]
+                HumanPop.remove(at: indicesToClean[i])
+                PlayDeathAnimation(human)
+                humansCount -= 1
+                destroyedCount += 1
+            }
+        }
+        if !indicesToSwap.isEmpty {
+            for i in 0...indicesToSwap.count-1 {
+                ZombiePop.append(HumanPop[indicesToSwap[i]])
+                HumanPop.remove(at: indicesToSwap[i])
+                zombieCount += 1
+                humansCount -= 1
+            }
+        }
+        indicesToClean.removeAll()
+        if !ZombiePop.isEmpty {
+            for i in 0...ZombiePop.count-1 {
+                if !ZombiePop[i].isAlive {
+                    indicesToClean.append(i)
+                }
+            }
+        }
+        if !indicesToClean.isEmpty {
+            for i in 0...indicesToClean.count-1 {
+                let zombie = ZombiePop[indicesToClean[i]]
+                ZombiePop.remove(at: indicesToClean[i])
+                PlayDeathAnimation(zombie)
+                zombieCount -= 1
+                destroyedCount += 1
+            }
+        }
     }
     
     func createHumans() {
@@ -126,17 +179,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    func didBegin(_ contact: SKPhysicsContact) {
-        if contact.bodyA.categoryBitMask == PhysicsCategory.Zombie || contact.bodyB.categoryBitMask == PhysicsCategory.Zombie{
-            let other = contact.bodyA.categoryBitMask == PhysicsCategory.Zombie ? contact.bodyB : contact.bodyA
-            switch other.categoryBitMask {
-            case PhysicsCategory.Zombie:
-                print("Rawr")
-            default:
-                break
-            }
-        }
-
+    func PlayDeathAnimation(_ human: Human) {
+        let particles = SKEmitterNode(fileNamed: "DeathAnimation")!
+        particles.position = human.shape.position
+        particles.zPosition = 10
+        background.addChild(particles)
+        particles.run(SKAction.removeFromParentAfterDelay(5.0))
+        human.shape.run(SKAction.sequence([SKAction.scale(to: 0.0, duration: 0.5), SKAction.removeFromParent()]))
     }
     
     func setHumanSpawner() {
@@ -145,7 +194,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             SKAction.run{ self.spawnHuman(human: self.HumanPop[self.humansCount])},
             SKAction.removeFromParent()])
         if self.action(forKey: "spawn") == nil &&
-            (humansCount+zombieCount) < HumanSettings.humanMaxPop {
+            (humansCount+zombieCount+destroyedCount) < HumanSettings.humanMaxPop {
             run(spawnAction, withKey: "spawn")
         }
     }
@@ -164,13 +213,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let decorationNode = building.childNode(withName: "buildingdeco") as! SKTileMapNode
             for row in 0..<building.numberOfRows {
                 for column in 0..<building.numberOfColumns {
-                    if let tile = tile(in: building, at: (column,row)) {
-                        let node = SKNode()
-                        node.position = building.centerOfTile(atColumn: column, row: row)
-                        node.physicsBody = SKPhysicsBody(rectangleOf: tile.size)
-                        node.physicsBody?.isDynamic = false
-                        building.addChild(node)
-                    }
                     if let tile1 = tile(in: decorationNode, at: (column,row)) {
                         if tile1.name == "door" {
                             var point = decorationNode.centerOfTile(atColumn: column, row: row)
@@ -181,6 +223,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     }
                 }
             }
+            let buildingTexture = SKTexture(imageNamed: "building1")
+            building.physicsBody = SKPhysicsBody(texture: buildingTexture, size: building.frame.size)
+            building.physicsBody?.isDynamic = false
         }
     }
     
@@ -201,7 +246,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    func setupCamera() {
+    func setupHudAndCamera() {
         guard let camera = camera, let view = view else { return }
         
         let xInset = min(view.bounds.width*0.5*camera.xScale, obstaclesTileMap.frame.width*0.5)
@@ -216,10 +261,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         edgeConstraint.referenceNode = obstaclesTileMap
         
         camera.constraints = [edgeConstraint]
+        
+        self.hud = HUD()
+        hud?.setupNodes(size: view.bounds.size)
+        camera.addChild(hud!)
     }
     
     func setupEdgeLoop() {
-
+        let edgeLoop = SKPhysicsBody(edgeLoopFrom: obstaclesTileMap.frame)
+        self.physicsBody = edgeLoop
     }
     
     func setupEmitters() {
@@ -233,7 +283,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func spawnHuman(human: Human) {
         let spawnPoint = spawnPoints[Int.random(min: 0, max: unlockedSpawns)]
         let move = SKAction.move(to: spawnPoint, duration: 0)
-        let recolor = SKAction.fadeAlpha(to: 1, duration: 2.0)
+        let recolor = SKAction.fadeAlpha(to: 1, duration: 0.5)
         let spawnAction = SKAction.sequence([move,recolor,SKAction.run{human.walk()}])
         human.shape.run(spawnAction)
         humansCount += 1
@@ -241,19 +291,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func tapZombie() {
         if numZTaps > 0 && initialTouch != .zero{
-            var index: Int = -1
             for i in 0...HumanPop.count-1 {
                 if HumanPop[i].shape.contains(initialTouch) && HumanPop[i].shape.contains(endTouch){
                     HumanPop[i].becomeZombie()
-                    ZombiePop.append(HumanPop[i])
-                    zombieCount += 1
                     numZTaps -= 1
-                    index = i
+                    initialTouch = .zero
                 }
-            }
-            if index >= 0 {
-                HumanPop.remove(at: index)
-                humansCount -= 1
             }
         }
     }
@@ -272,19 +315,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         var target: Human?
         for zombie in ZombiePop{
             for human in HumanPop {
-                if zombie.maxRange > (zombie.shape.position - human.shape.position).length(){
-                    human.runAway(zombiePosition: zombie.shape.position)
-                    if zombie.closestHuman == 0 || (zombie.closestHuman >= (zombie.shape.position - human.shape.position).length()) {
-                        zombie.closestHuman = (zombie.shape.position-human.shape.position).length()
-                        target = human
+                if human.isAlive {
+                    if zombie.maxRange > (zombie.shape.position - human.shape.position).length(){
+                        human.runAway(zombiePosition: zombie.shape.position)
+                        if zombie.closestHuman == 0 || (zombie.closestHuman >= (zombie.shape.position - human.shape.position).length()) {
+                            zombie.closestHuman = (zombie.shape.position-human.shape.position).length()
+                            target = human
+                        }
                     }
                 }
             }
             if target != nil {
-                zombie.chase(human: target!)
+                if target!.canTurn {
+                    zombie.chase(human: target!)
+                }
             } else {
                 zombie.closestHuman = 0
             }
+            target = nil
         }
     }
 }

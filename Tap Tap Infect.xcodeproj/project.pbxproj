@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D3C46E51F0B147A00876582 /* DeathAnimation.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1D3C46E41F0B147A00876582 /* DeathAnimation.sks */; };
+		1D3C46E71F0B2B0200876582 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3C46E61F0B2B0200876582 /* Button.swift */; };
 		1D721A641EFB33EE00CC6F5C /* TileSets.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1D721A631EFB33EE00CC6F5C /* TileSets.sks */; };
 		1D8FD24A1EF5CA0A00C29815 /* HelperNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FD2491EF5CA0A00C29815 /* HelperNode.swift */; };
 		1D8FD2581EF5CB8100C29815 /* CGFloat+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FD24C1EF5CB8100C29815 /* CGFloat+Extensions.swift */; };
@@ -37,6 +39,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1D3C46E41F0B147A00876582 /* DeathAnimation.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = DeathAnimation.sks; sourceTree = "<group>"; };
+		1D3C46E61F0B2B0200876582 /* Button.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
 		1D721A631EFB33EE00CC6F5C /* TileSets.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; name = TileSets.sks; path = "Tap Tap Infect/TileSets.sks"; sourceTree = "<group>"; };
 		1D8FD2491EF5CA0A00C29815 /* HelperNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelperNode.swift; sourceTree = "<group>"; };
 		1D8FD24C1EF5CB8100C29815 /* CGFloat+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGFloat+Extensions.swift"; sourceTree = "<group>"; };
@@ -111,6 +115,7 @@
 			isa = PBXGroup;
 			children = (
 				1DBF7EA31F06FF6E00E8CB83 /* Assets.xcassets */,
+				1D3C46E41F0B147A00876582 /* DeathAnimation.sks */,
 			);
 			name = Particles;
 			sourceTree = "<group>";
@@ -152,6 +157,7 @@
 				1DDB06541EECC0B4002B0707 /* Info.plist */,
 				1DCE17FA1EFEEF5700554C4A /* Extensions.swift */,
 				1DCE17FC1EFEEF6000554C4A /* Types.swift */,
+				1D3C46E61F0B2B0200876582 /* Button.swift */,
 			);
 			path = "Tap Tap Infect";
 			sourceTree = "<group>";
@@ -253,6 +259,7 @@
 				1DDB06531EECC0B4002B0707 /* LaunchScreen.storyboard in Resources */,
 				1DBF7EA51F06FF6E00E8CB83 /* Assets.xcassets in Resources */,
 				1DDB06471EECC0B4002B0707 /* Actions.sks in Resources */,
+				1D3C46E51F0B147A00876582 /* DeathAnimation.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,6 +277,7 @@
 				1D8FD25A1EF5CB8100C29815 /* CGVector+Extensions.swift in Sources */,
 				1D8FD2591EF5CB8100C29815 /* CGPoint+Extensions.swift in Sources */,
 				1D8FD2581EF5CB8100C29815 /* CGFloat+Extensions.swift in Sources */,
+				1D3C46E71F0B2B0200876582 /* Button.swift in Sources */,
 				1DDB064B1EECC0B4002B0707 /* GameViewController.swift in Sources */,
 				1DCE17FB1EFEEF5700554C4A /* Extensions.swift in Sources */,
 				1D8FD2651EF5F39C00C29815 /* Human.swift in Sources */,
