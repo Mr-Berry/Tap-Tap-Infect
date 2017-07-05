@@ -22,7 +22,7 @@ class GameScene: SKScene {
     var lastUpdateTimeInterval: TimeInterval = 0
     var deltaTime: TimeInterval = 0
     
-    var cameraNode = SKCameraNode()
+    var cameraNode: SKCameraNode!
     var humansCount: Int = 0
     var zombieCount: Int = 0
     var destroyedCount: Int = 0
@@ -33,21 +33,21 @@ class GameScene: SKScene {
     
     var hud: HUD?
     
+    var buildings: SKNode!
     var background: SKTileMapNode!
     var obstaclesTileMap: SKTileMapNode!
     var buildingsTileMap: [SKTileMapNode] = []
     var clouds: SKTileMapNode!
     
     var numZTaps: Int = 5
-    var unlockedSpawns: Int = 1
-    let cameraMoveSpeed: Float = 20.0
+    var unlockedSpawns: Int = 3
+    let cameraMoveSpeed: Float = 10.0
     var initialTouch: CGPoint = .zero
     var endTouch: CGPoint = .zero
     var spawnPoints: [CGPoint] = []
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        
     }
     
     override func didMove(to view: SKView) {
@@ -84,6 +84,9 @@ class GameScene: SKScene {
             return
         }
         endTouch = touch.location(in: self)
+        if hud!.resetButton!.contains(endTouch){
+            print("zombieCount")
+        }
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -96,7 +99,17 @@ class GameScene: SKScene {
         setHumanSpawner()
         tapZombie()
         updateHumansAndZombies()
+        updateBuildings()
         cleanUp()
+    }
+    
+    func buildingBounceAndShake(building: SKTileMapNode) {
+        let decorationNode = building.childNode(withName: "buildingdeco") as! SKTileMapNode
+        let fadeOut = SKAction.fadeAlpha(to: 0.5, duration: 0.5)
+        let fadeIn = SKAction.fadeIn(withDuration: 0.5)
+        decorationNode.run(SKAction.sequence([fadeOut,fadeIn]))
+        building.run(SKAction.sequence([fadeOut,fadeIn]))
+        hud!.updateHUD(.buildingTapped)
     }
     
     func cleanUp() {
@@ -144,6 +157,21 @@ class GameScene: SKScene {
                 zombieCount -= 1
                 destroyedCount += 1
             }
+        }
+    }
+    
+    func convertHuman(human: Human) {
+        switch human.category {
+        case humanType.military.rawValue:
+            human.category = humanType.cop.rawValue
+            human.color = .blue
+            human.shape.fillColor = human.color
+        case humanType.cop.rawValue:
+            human.category = humanType.civilian.rawValue
+            human.color = .white
+            human.shape.fillColor = human.color
+        default:
+            human.becomeZombie()
         }
     }
     
@@ -200,10 +228,15 @@ class GameScene: SKScene {
     }
     
     func setupBuildings() {
-        let buildings = childNode(withName: "buildings")!
+        buildings = childNode(withName: "buildings")!
+        var i = 1
         buildings.enumerateChildNodes(withName: "*", using: {(node,stop) in
             let building = node as! SKTileMapNode
             self.buildingsTileMap.append(building)
+            let buildingTexture = SKTexture(imageNamed: "building\(i)")
+            building.physicsBody = SKPhysicsBody(texture: buildingTexture, size: building.frame.size)
+            building.physicsBody?.isDynamic = false
+            i+=1
         })
     }
     
@@ -211,8 +244,8 @@ class GameScene: SKScene {
         setupBuildings()
         for building in buildingsTileMap {
             let decorationNode = building.childNode(withName: "buildingdeco") as! SKTileMapNode
-            for row in 0..<building.numberOfRows {
-                for column in 0..<building.numberOfColumns {
+            for row in 0..<decorationNode.numberOfRows {
+                for column in 0..<decorationNode.numberOfColumns {
                     if let tile1 = tile(in: decorationNode, at: (column,row)) {
                         if tile1.name == "door" {
                             var point = decorationNode.centerOfTile(atColumn: column, row: row)
@@ -223,9 +256,6 @@ class GameScene: SKScene {
                     }
                 }
             }
-            let buildingTexture = SKTexture(imageNamed: "building1")
-            building.physicsBody = SKPhysicsBody(texture: buildingTexture, size: building.frame.size)
-            building.physicsBody?.isDynamic = false
         }
     }
     
@@ -263,8 +293,9 @@ class GameScene: SKScene {
         camera.constraints = [edgeConstraint]
         
         self.hud = HUD()
-        hud?.setupNodes(size: view.bounds.size)
-        camera.addChild(hud!)
+        hud!.setupNodes(size: camera.frame.size)
+        cameraNode.addChild(hud!)
+        hud!.position = cameraNode.position
     }
     
     func setupEdgeLoop() {
@@ -293,7 +324,7 @@ class GameScene: SKScene {
         if numZTaps > 0 && initialTouch != .zero{
             for i in 0...HumanPop.count-1 {
                 if HumanPop[i].shape.contains(initialTouch) && HumanPop[i].shape.contains(endTouch){
-                    HumanPop[i].becomeZombie()
+                    convertHuman(human: HumanPop[i])
                     numZTaps -= 1
                     initialTouch = .zero
                 }
@@ -333,6 +364,18 @@ class GameScene: SKScene {
                 zombie.closestHuman = 0
             }
             target = nil
+        }
+    }
+    
+    func updateBuildings() {
+        var i = 0
+        for building in buildingsTileMap {
+            if building.contains(convert(initialTouch, to: buildings)) && building.contains(convert(endTouch, to: buildings)){
+                print("building\(i)")
+                buildingBounceAndShake(building: building)
+                initialTouch = .zero
+            }
+            i+=1
         }
     }
 }

@@ -12,21 +12,29 @@ import UIKit
 
 class Button: SKSpriteNode{
     
+    var button: SKShapeNode = SKShapeNode()
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
-    
+
     override init(texture: SKTexture?, color: UIColor, size: CGSize) {
         super.init(texture: texture, color: color, size: size)
-        self.position = .zero
+        setupTouchNode(size: size)
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event)
-        interact()
+    func setupTouchNode(size: CGSize) {
+        button = SKShapeNode(rectOf: size)
+        button.fillColor = .clear
+        button.strokeColor = .clear
+        self.addChild(button)
     }
     
-    func interact() {
-        print("here")
-    }
+//    override func contains(_ point: CGPoint) -> Bool {
+//        var retVal = false
+//        if button.contains(point) {
+//            retVal = true
+//        }
+//        return retVal
+//    }
 }

@@ -43,7 +43,6 @@ class Human {
     var color = UIColor()
     
     var shape: SKShapeNode = SKShapeNode()
-    var range: SKShapeNode = SKShapeNode()
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -223,11 +222,7 @@ class Human {
     }
     
     func setRange() {
-        maxRange = CGFloat(15*radius)
-        range = SKShapeNode(circleOfRadius: maxRange)
-        range.strokeColor = .black
-        range.fillColor = .clear
-        shape.addChild(range)
+        maxRange = CGFloat(20*radius)
     }
     
     func takeDamage(_ damage: Int) {
