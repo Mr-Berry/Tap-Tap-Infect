@@ -12,7 +12,8 @@ import SpriteKit
 enum HUDSettings {
     static let font = "Noteworthy-Bold"
     static let fontSize: CGFloat = 50
-    static let messageSize = 320
+    static let backgroundradius = 20
+    static let backgroundpadding: CGFloat = 20.0
 }
 
 enum HUDMessages {
@@ -36,8 +37,6 @@ class HUD: SKNode {
     let upgradesTexture = SKTexture(imageNamed: "HUD_1")
     let zCountTexture = SKTexture(imageNamed: "HUD_2")
     
-    var messageNode: SKShapeNode!
-    
     var resetButton: Button?
     var upgradesButton: Button?
     var zCountButton: Button?
@@ -45,12 +44,12 @@ class HUD: SKNode {
     
     var zCountLabel: SKLabelNode?
     var brainCountLabel: SKLabelNode?
-    var messageLabel: SKLabelNode!
     
-    var fillRectR: SKShapeNode?
-    var fillRectL: SKShapeNode?
-    
-    var hudState: HUDState = .initial
+    var hudState: HUDState = .initial {
+        didSet {
+            updateHUDState(from: oldValue, to: hudState)
+        }
+    }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -69,14 +68,22 @@ class HUD: SKNode {
         label.zPosition = 100
         label.fontSize = fontSize
         label.position = position
+        label.addChild(addBackground(size: label.frame.size, color: .black))
         addChild(label)
     }
+    
+    func addBackground(size: CGSize, color: UIColor) -> SKShapeNode {
+        let background = SKShapeNode(rectOf: CGSize(width: size.width+HUDSettings.backgroundpadding,
+                                                height: size.height+HUDSettings.backgroundpadding))
+        background.fillColor = color
+        background.position = CGPoint(x: 0,
+        y: 0.5*size.height)
+        return background
+    }
 
-    func clearUI() {
-        switch hudState {
+    func clearUI(_ oldState: HUDState) {
+        switch oldState {
         case .initial:
-            remove(message: HUDMessages.win)
-            remove(message: HUDMessages.nextLevel)
             break
         case .buildingTapped:
             remove(message: HUDMessages.enterBuilding)
@@ -102,18 +109,18 @@ class HUD: SKNode {
         resetButton = Button(texture: resetTexture, color: .clear, size: resetTexture.size())
         resetButton!.position = CGPoint(x: 0, y: size.height*0.5+0.3*resetButton!.size.height)
         resetButton!.name = "reset"
-        resetButton?.zPosition = 100
-        
-        upgradesButton = Button(texture: upgradesTexture, color: .clear, size: upgradesTexture.size())
-        upgradesButton!.position = CGPoint(x: size.width*0.25, y: resetButton!.position.y)
-        upgradesButton!.name = "upgrades"
-        upgradesButton!.zPosition = 100
+        resetButton!.zPosition = 100
         
         zCountButton = Button(texture: zCountTexture, color: .clear, size: zCountTexture.size())
-        zCountButton!.position = CGPoint(x: upgradesButton!.position.x + upgradesButton!.size.width*0.8, y: resetButton!.position.y-2)
+        zCountButton!.position = CGPoint(x: size.width*0.5+0.3*zCountButton!.size.height-2, y: resetButton!.position.y-2)
         zCountButton!.name = "zCounter"
         zCountButton!.zPosition = 100
         
+        upgradesButton = Button(texture: upgradesTexture, color: .clear, size: upgradesTexture.size())
+        upgradesButton!.position = CGPoint(x: zCountButton!.position.x-0.8*upgradesButton!.size.width, y: resetButton!.position.y)
+        upgradesButton!.name = "upgrades"
+        upgradesButton!.zPosition = 100
+    
         self.addChild(resetButton!)
         self.addChild(upgradesButton!)
         self.addChild(zCountButton!)
@@ -121,33 +128,10 @@ class HUD: SKNode {
     
     func setupNodes(size: CGSize) {
         setupButtons(size: size)
-        setupShapes(size: size)
     }
     
-    func setupShapes(size: CGSize) {
-        let rect = CGRect(x: zCountButton!.position.x + zCountButton!.size.width,
-                          y: zCountButton!.position.y - 0.5*zCountButton!.size.height + 4,
-                          width: size.width*0.5 - (zCountButton!.position.x + zCountButton!.size.width),
-                          height: zCountButton!.size.height)
-        fillRectR = SKShapeNode(rect: rect)
-        fillRectR!.fillColor = #colorLiteral(red: 0.3176470697, green: 0.07450980693, blue: 0.02745098062, alpha: 1)
-        self.addChild(fillRectR!)
-    }
-    
-    func setupMessageNode() {
-        let rect = CGRect(x: 0, y: 0, width: HUDSettings.messageSize, height: HUDSettings.messageSize)
-        
-        messageNode = SKShapeNode(rect: rect, cornerRadius: 10)
-        messageNode.fillColor = .clear
-        messageNode.strokeColor = .clear
-        messageLabel.fontName = HUDSettings.font
-        messageLabel.fontSize = HUDSettings.fontSize
-        messageNode.addChild(messageLabel)
-        self.addChild(messageNode)
-    }
-    
-    func updateHUDState(to: HUDState) {
-        clearUI()
+    func updateHUDState(from: HUDState, to: HUDState) {
+        clearUI(from)
         updateHUD(to)
     }
 

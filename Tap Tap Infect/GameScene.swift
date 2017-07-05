@@ -86,10 +86,6 @@ class GameScene: SKScene {
             return
         }
         endTouch = touch.location(in: self)
-        if hud.resetButton!.contains(convert(endTouch, to: hud)){
-            print("zombieCount")
-        }
-
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -99,6 +95,7 @@ class GameScene: SKScene {
             deltaTime = 0
         }
         lastUpdateTimeInterval = currentTime
+        updateHUD()
         setHumanSpawner()
         tapZombie()
         updateBuildings()
@@ -112,7 +109,25 @@ class GameScene: SKScene {
         let fadeIn = SKAction.fadeIn(withDuration: 0.5)
         decorationNode.run(SKAction.sequence([fadeOut,fadeIn]))
         building.run(SKAction.sequence([fadeOut,fadeIn]))
-        hud.updateHUD(.buildingTapped)
+        hud.hudState = .buildingTapped
+    }
+    
+    func buttonTaps() {
+        let firstTouch = convert(initialTouch, to: hud)
+        let lastTouch = convert(endTouch, to: hud)
+        if hud.resetButton!.contains(firstTouch) && hud.resetButton!.contains(lastTouch) {
+            print("reset!")
+            initialTouch = .zero
+            endTouch = .zero
+        } else if hud.upgradesButton!.contains(firstTouch) && hud.upgradesButton!.contains(lastTouch) {
+            print("upgrade!")
+            initialTouch = .zero
+            endTouch = .zero
+        } else if hud.zCountButton!.contains(firstTouch) && hud.zCountButton!.contains(lastTouch){
+            print("zombieCount!")
+            initialTouch = .zero
+            endTouch = .zero
+        }
     }
     
     func cleanUp() {
@@ -385,6 +400,12 @@ class GameScene: SKScene {
                 endTouch = .zero
             }
             i+=1
+        }
+    }
+    
+    func updateHUD() {
+        if hud.hudState == .initial {
+            buttonTaps()
         }
     }
 }
