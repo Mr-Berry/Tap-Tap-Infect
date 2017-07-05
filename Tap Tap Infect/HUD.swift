@@ -100,16 +100,19 @@ class HUD: SKNode {
     
     func setupButtons(size: CGSize) {
         resetButton = Button(texture: resetTexture, color: .clear, size: resetTexture.size())
-        resetButton!.position = CGPoint(x: 0, y: 0)
+        resetButton!.position = CGPoint(x: 0, y: size.height*0.5+0.3*resetButton!.size.height)
         resetButton!.name = "reset"
+        resetButton?.zPosition = 100
         
         upgradesButton = Button(texture: upgradesTexture, color: .clear, size: upgradesTexture.size())
         upgradesButton!.position = CGPoint(x: size.width*0.25, y: resetButton!.position.y)
         upgradesButton!.name = "upgrades"
+        upgradesButton!.zPosition = 100
         
         zCountButton = Button(texture: zCountTexture, color: .clear, size: zCountTexture.size())
         zCountButton!.position = CGPoint(x: upgradesButton!.position.x + upgradesButton!.size.width*0.8, y: resetButton!.position.y-2)
         zCountButton!.name = "zCounter"
+        zCountButton!.zPosition = 100
         
         self.addChild(resetButton!)
         self.addChild(upgradesButton!)

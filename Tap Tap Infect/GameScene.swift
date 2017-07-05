@@ -31,7 +31,7 @@ class GameScene: SKScene {
     var HumanPop: [Human] = []
     var ZombiePop: [Human] = []
     
-    var hud: HUD?
+    var hud = HUD()
     
     var buildings: SKNode!
     var background: SKTileMapNode!
@@ -43,6 +43,7 @@ class GameScene: SKScene {
     var unlockedSpawns: Int = 3
     let cameraMoveSpeed: Float = 10.0
     var initialTouch: CGPoint = .zero
+    var movedTouch: CGPoint = .zero
     var endTouch: CGPoint = .zero
     var spawnPoints: [CGPoint] = []
     
@@ -64,18 +65,19 @@ class GameScene: SKScene {
             return
         }
         initialTouch = touch.location(in: self)
+        movedTouch = initialTouch
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
             let location = touch.location(in: cameraNode)
-            let offset = initialTouch - location
+            let offset = movedTouch - location
             let direction = offset/offset.length()
             let vector = CGVector(dx: direction.x*CGFloat(cameraMoveSpeed),
-                                  dy: -1*direction.y*CGFloat(cameraMoveSpeed))
+                                  dy: direction.y*CGFloat(cameraMoveSpeed))
 
-            camera!.run(SKAction.sequence([SKAction.move(by: vector, duration: 0.1)]))
-            initialTouch = location
+            cameraNode.run(SKAction.sequence([SKAction.move(by: vector, duration: 0.1)]))
+            movedTouch = location
         }
     }
     
@@ -84,9 +86,10 @@ class GameScene: SKScene {
             return
         }
         endTouch = touch.location(in: self)
-        if hud!.resetButton!.contains(endTouch){
+        if hud.resetButton!.contains(convert(endTouch, to: hud)){
             print("zombieCount")
         }
+
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -98,8 +101,8 @@ class GameScene: SKScene {
         lastUpdateTimeInterval = currentTime
         setHumanSpawner()
         tapZombie()
-        updateHumansAndZombies()
         updateBuildings()
+        updateHumansAndZombies()
         cleanUp()
     }
     
@@ -109,7 +112,7 @@ class GameScene: SKScene {
         let fadeIn = SKAction.fadeIn(withDuration: 0.5)
         decorationNode.run(SKAction.sequence([fadeOut,fadeIn]))
         building.run(SKAction.sequence([fadeOut,fadeIn]))
-        hud!.updateHUD(.buildingTapped)
+        hud.updateHUD(.buildingTapped)
     }
     
     func cleanUp() {
@@ -277,10 +280,13 @@ class GameScene: SKScene {
     }
     
     func setupHudAndCamera() {
-        guard let camera = camera, let view = view else { return }
         
-        let xInset = min(view.bounds.width*0.5*camera.xScale, obstaclesTileMap.frame.width*0.5)
-        let yInset = min(view.bounds.height*0.5*camera.yScale, obstaclesTileMap.frame.height*0.5)
+        guard let view = view else { return }
+        
+        cameraNode = camera
+        
+        let xInset = min(view.bounds.width*0.5*cameraNode.xScale, obstaclesTileMap.frame.width*0.5)
+        let yInset = min(view.bounds.height*0.5*cameraNode.yScale, obstaclesTileMap.frame.height*0.5)
         
         let constraintRect = obstaclesTileMap.frame.insetBy(dx: xInset, dy: yInset)
         
@@ -290,12 +296,11 @@ class GameScene: SKScene {
         let edgeConstraint = SKConstraint.positionX(xRange, y: yRange)
         edgeConstraint.referenceNode = obstaclesTileMap
         
-        camera.constraints = [edgeConstraint]
+        cameraNode.constraints = [edgeConstraint]
         
-        self.hud = HUD()
-        hud!.setupNodes(size: camera.frame.size)
-        cameraNode.addChild(hud!)
-        hud!.position = cameraNode.position
+        hud.setupNodes(size: view.frame.size)
+        cameraNode.addChild(hud)
+        hud.position = .zero
     }
     
     func setupEdgeLoop() {
@@ -323,10 +328,13 @@ class GameScene: SKScene {
     func tapZombie() {
         if numZTaps > 0 && initialTouch != .zero{
             for i in 0...HumanPop.count-1 {
-                if HumanPop[i].shape.contains(initialTouch) && HumanPop[i].shape.contains(endTouch){
-                    convertHuman(human: HumanPop[i])
-                    numZTaps -= 1
-                    initialTouch = .zero
+                if endTouch != .zero {
+                    if HumanPop[i].shape.contains(initialTouch) && HumanPop[i].shape.contains(endTouch){
+                        convertHuman(human: HumanPop[i])
+                        numZTaps -= 1
+                        endTouch = .zero
+                        initialTouch = .zero
+                    }
                 }
             }
         }
@@ -370,10 +378,11 @@ class GameScene: SKScene {
     func updateBuildings() {
         var i = 0
         for building in buildingsTileMap {
-            if building.contains(convert(initialTouch, to: buildings)) && building.contains(convert(endTouch, to: buildings)){
+            if building.contains(convert(initialTouch, to: buildings)) && building.contains(convert (endTouch, to: buildings)){
                 print("building\(i)")
                 buildingBounceAndShake(building: building)
                 initialTouch = .zero
+                endTouch = .zero
             }
             i+=1
         }
