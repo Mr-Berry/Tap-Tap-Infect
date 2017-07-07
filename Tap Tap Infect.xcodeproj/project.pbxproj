@@ -7,15 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1D2C21741F0C19C80077173D /* Floor1.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1D2C21731F0C19C80077173D /* Floor1.sks */; };
-		1D2C21761F0C1A0D0077173D /* ZombieMwalk.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1D2C21751F0C1A0D0077173D /* ZombieMwalk.sks */; };
-		1D2C21781F0C1BB00077173D /* ZombieFwalk.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1D2C21771F0C1BB00077173D /* ZombieFwalk.sks */; };
-		1D2C217A1F0C1BD00077173D /* ZombieMattack.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1D2C21791F0C1BD00077173D /* ZombieMattack.sks */; };
-		1D2C217C1F0C1DD70077173D /* ZombieMdie.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1D2C217B1F0C1DD70077173D /* ZombieMdie.sks */; };
 		1D3C46E51F0B147A00876582 /* DeathAnimation.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1D3C46E41F0B147A00876582 /* DeathAnimation.sks */; };
 		1D3C46E71F0B2B0200876582 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3C46E61F0B2B0200876582 /* Button.swift */; };
 		1D721A641EFB33EE00CC6F5C /* TileSets.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1D721A631EFB33EE00CC6F5C /* TileSets.sks */; };
-		1D8FD24A1EF5CA0A00C29815 /* HelperNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FD2491EF5CA0A00C29815 /* HelperNode.swift */; };
 		1D8FD2581EF5CB8100C29815 /* CGFloat+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FD24C1EF5CB8100C29815 /* CGFloat+Extensions.swift */; };
 		1D8FD2591EF5CB8100C29815 /* CGPoint+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FD24D1EF5CB8100C29815 /* CGPoint+Extensions.swift */; };
 		1D8FD25A1EF5CB8100C29815 /* CGVector+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FD24E1EF5CB8100C29815 /* CGVector+Extensions.swift */; };
@@ -41,18 +35,14 @@
 		1DDB064E1EECC0B4002B0707 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1DDB064C1EECC0B4002B0707 /* Main.storyboard */; };
 		1DDB06501EECC0B4002B0707 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1DDB064F1EECC0B4002B0707 /* Assets.xcassets */; };
 		1DDB06531EECC0B4002B0707 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1DDB06511EECC0B4002B0707 /* LaunchScreen.storyboard */; };
+		1DE48A881F0EED5B00244A88 /* Brainz.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1DE48A871F0EED5B00244A88 /* Brainz.sks */; };
+		1DE48A8A1F0EEF1500244A88 /* Shout.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1DE48A891F0EEF1500244A88 /* Shout.sks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1D2C21731F0C19C80077173D /* Floor1.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Floor1.sks; sourceTree = "<group>"; };
-		1D2C21751F0C1A0D0077173D /* ZombieMwalk.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ZombieMwalk.sks; sourceTree = "<group>"; };
-		1D2C21771F0C1BB00077173D /* ZombieFwalk.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ZombieFwalk.sks; sourceTree = "<group>"; };
-		1D2C21791F0C1BD00077173D /* ZombieMattack.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ZombieMattack.sks; sourceTree = "<group>"; };
-		1D2C217B1F0C1DD70077173D /* ZombieMdie.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ZombieMdie.sks; sourceTree = "<group>"; };
 		1D3C46E41F0B147A00876582 /* DeathAnimation.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = DeathAnimation.sks; sourceTree = "<group>"; };
 		1D3C46E61F0B2B0200876582 /* Button.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
 		1D721A631EFB33EE00CC6F5C /* TileSets.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; name = TileSets.sks; path = "Tap Tap Infect/TileSets.sks"; sourceTree = "<group>"; };
-		1D8FD2491EF5CA0A00C29815 /* HelperNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelperNode.swift; sourceTree = "<group>"; };
 		1D8FD24C1EF5CB8100C29815 /* CGFloat+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGFloat+Extensions.swift"; sourceTree = "<group>"; };
 		1D8FD24D1EF5CB8100C29815 /* CGPoint+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGPoint+Extensions.swift"; sourceTree = "<group>"; };
 		1D8FD24E1EF5CB8100C29815 /* CGVector+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGVector+Extensions.swift"; sourceTree = "<group>"; };
@@ -65,7 +55,7 @@
 		1D8FD2551EF5CB8100C29815 /* SKTEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKTEffects.swift; sourceTree = "<group>"; };
 		1D8FD2561EF5CB8100C29815 /* SKTTimingFunctions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKTTimingFunctions.swift; sourceTree = "<group>"; };
 		1D8FD2571EF5CB8100C29815 /* Vector3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vector3.swift; sourceTree = "<group>"; };
-		1D8FD2641EF5F39C00C29815 /* Human.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Human.swift; sourceTree = "<group>"; };
+		1D8FD2641EF5F39C00C29815 /* Human.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Human.swift; path = ../Human.swift; sourceTree = "<group>"; };
 		1DBF7EA31F06FF6E00E8CB83 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1DCE17FA1EFEEF5700554C4A /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		1DCE17FC1EFEEF6000554C4A /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
@@ -80,6 +70,8 @@
 		1DDB064F1EECC0B4002B0707 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1DDB06521EECC0B4002B0707 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1DDB06541EECC0B4002B0707 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1DE48A871F0EED5B00244A88 /* Brainz.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Brainz.sks; sourceTree = "<group>"; };
+		1DE48A891F0EEF1500244A88 /* Shout.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Shout.sks; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,24 +88,11 @@
 		1D25266C1EFC6E8100E21FE4 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
-				1D2C217D1F0C1E660077173D /* Zombies */,
 				1D721A631EFB33EE00CC6F5C /* TileSets.sks */,
 				1DDB06441EECC0B4002B0707 /* GameScene.sks */,
-				1D2C21731F0C19C80077173D /* Floor1.sks */,
 			);
 			name = Scenes;
 			path = ..;
-			sourceTree = "<group>";
-		};
-		1D2C217D1F0C1E660077173D /* Zombies */ = {
-			isa = PBXGroup;
-			children = (
-				1D2C21751F0C1A0D0077173D /* ZombieMwalk.sks */,
-				1D2C21771F0C1BB00077173D /* ZombieFwalk.sks */,
-				1D2C21791F0C1BD00077173D /* ZombieMattack.sks */,
-				1D2C217B1F0C1DD70077173D /* ZombieMdie.sks */,
-			);
-			name = Zombies;
 			sourceTree = "<group>";
 		};
 		1D8FD24B1EF5CB8100C29815 /* SKTUtils */ = {
@@ -140,6 +119,8 @@
 			children = (
 				1DBF7EA31F06FF6E00E8CB83 /* Assets.xcassets */,
 				1D3C46E41F0B147A00876582 /* DeathAnimation.sks */,
+				1DE48A871F0EED5B00244A88 /* Brainz.sks */,
+				1DE48A891F0EEF1500244A88 /* Shout.sks */,
 			);
 			name = Particles;
 			path = ..;
@@ -166,11 +147,10 @@
 		1DDB06411EECC0B4002B0707 /* Tap Tap Infect */ = {
 			isa = PBXGroup;
 			children = (
-				1DDB065C1EECC4C4002B0707 /* Humans */,
-				1DF6683B1EEE0FC300FEA71F /* Objects */,
 				1D25266C1EFC6E8100E21FE4 /* Scenes */,
 				1DBF7EA11F06FF3900E8CB83 /* Particles */,
 				1DDB06421EECC0B4002B0707 /* AppDelegate.swift */,
+				1D8FD2641EF5F39C00C29815 /* Human.swift */,
 				1DCE17FE1EFF514400554C4A /* HUD.swift */,
 				1DDB06461EECC0B4002B0707 /* Actions.sks */,
 				1DDB06481EECC0B4002B0707 /* GameScene.swift */,
@@ -191,24 +171,6 @@
 			children = (
 			);
 			name = Sounds;
-			sourceTree = "<group>";
-		};
-		1DDB065C1EECC4C4002B0707 /* Humans */ = {
-			isa = PBXGroup;
-			children = (
-				1D8FD2641EF5F39C00C29815 /* Human.swift */,
-			);
-			name = Humans;
-			path = ..;
-			sourceTree = "<group>";
-		};
-		1DF6683B1EEE0FC300FEA71F /* Objects */ = {
-			isa = PBXGroup;
-			children = (
-				1D8FD2491EF5CA0A00C29815 /* HelperNode.swift */,
-			);
-			name = Objects;
-			path = ..;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -274,16 +236,13 @@
 				1D721A641EFB33EE00CC6F5C /* TileSets.sks in Resources */,
 				1DDB064E1EECC0B4002B0707 /* Main.storyboard in Resources */,
 				1DDB06451EECC0B4002B0707 /* GameScene.sks in Resources */,
-				1D2C21741F0C19C80077173D /* Floor1.sks in Resources */,
+				1DE48A8A1F0EEF1500244A88 /* Shout.sks in Resources */,
+				1DE48A881F0EED5B00244A88 /* Brainz.sks in Resources */,
 				1DDB06501EECC0B4002B0707 /* Assets.xcassets in Resources */,
 				1DDB06531EECC0B4002B0707 /* LaunchScreen.storyboard in Resources */,
 				1DBF7EA51F06FF6E00E8CB83 /* Assets.xcassets in Resources */,
-				1D2C21781F0C1BB00077173D /* ZombieFwalk.sks in Resources */,
 				1DDB06471EECC0B4002B0707 /* Actions.sks in Resources */,
-				1D2C217C1F0C1DD70077173D /* ZombieMdie.sks in Resources */,
-				1D2C21761F0C1A0D0077173D /* ZombieMwalk.sks in Resources */,
 				1D3C46E51F0B147A00876582 /* DeathAnimation.sks in Resources */,
-				1D2C217A1F0C1BD00077173D /* ZombieMattack.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -296,7 +255,6 @@
 			files = (
 				1DDB06491EECC0B4002B0707 /* GameScene.swift in Sources */,
 				1D8FD2621EF5CB8100C29815 /* SKTTimingFunctions.swift in Sources */,
-				1D8FD24A1EF5CA0A00C29815 /* HelperNode.swift in Sources */,
 				1DCE17FD1EFEEF6000554C4A /* Types.swift in Sources */,
 				1D8FD25A1EF5CB8100C29815 /* CGVector+Extensions.swift in Sources */,
 				1D8FD2591EF5CB8100C29815 /* CGPoint+Extensions.swift in Sources */,

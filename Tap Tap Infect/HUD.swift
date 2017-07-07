@@ -10,10 +10,11 @@ import Foundation
 import SpriteKit
 
 enum HUDSettings {
+    static let largeFont = "Futura-CondensedExtraBold"
     static let font = "Noteworthy-Bold"
     static let fontSize: CGFloat = 50
     static let backgroundradius = 20
-    static let backgroundpadding: CGFloat = 20.0
+    static let backgroundpadding: CGFloat = 30.0
 }
 
 enum HUDMessages {
@@ -21,14 +22,14 @@ enum HUDMessages {
     static let win = "You Win!"
     static let lose = "Out Of Time!"
     static let nextLevel = "Tap for Next Level"
-    static let playAgain = "Tap to Play Again"
-    static let enterBuilding = "Enter the building?"
-    static let yes = "Yes"
-    static let no = "No"
+    static let gameOver = "Tap to Play Again"
+    static let attack = "Make Zombies Attack?"
+    static let yes = "Attack!"
+    static let no = "Not now!"
 }
 
 enum HUDState: Int {
-    case initial = 0, buildingTapped, start, reload
+    case initial = 0, buildingTapped, attackTapped, gameOver
 }
 
 class HUD: SKNode {
@@ -53,6 +54,8 @@ class HUD: SKNode {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+        zCountLabel = childNode(withName: "ZombieCounter") as? SKLabelNode
+        brainCountLabel = childNode(withName: "BrainCounter") as? SKLabelNode
     }
     
     override init() {
@@ -62,23 +65,34 @@ class HUD: SKNode {
     
     func add(message: String, position: CGPoint, fontSize: CGFloat = HUDSettings.fontSize) {
         let label: SKLabelNode
-        label = SKLabelNode(fontNamed: HUDSettings.font)
+        label = SKLabelNode(fontNamed: HUDSettings.largeFont)
         label.text = message
         label.name = message
         label.zPosition = 100
         label.fontSize = fontSize
         label.position = position
-        label.addChild(addBackground(size: label.frame.size, color: .black))
+        label.addChild(addBackground(size: label.frame.size, color: .black, name: message))
         addChild(label)
     }
     
-    func addBackground(size: CGSize, color: UIColor) -> SKShapeNode {
-        let background = SKShapeNode(rectOf: CGSize(width: size.width+HUDSettings.backgroundpadding,
-                                                height: size.height+HUDSettings.backgroundpadding))
+    func addBackground(size: CGSize, color: UIColor, name: String) -> SKShapeNode {
+        let background = SKShapeNode(rectOf: CGSize(width: size.width+HUDSettings.backgroundpadding, height: size.height+HUDSettings.backgroundpadding),
+            cornerRadius: CGFloat(HUDSettings.backgroundradius))
+        background.fillTexture = SKTexture(imageNamed: "whitePuff00")
         background.fillColor = color
-        background.position = CGPoint(x: 0,
-        y: 0.5*size.height)
+        background.strokeColor = .clear
+        background.position = CGPoint(x: 0, y: 0.5*size.height)
+        background.name = name
         return background
+    }
+    
+    func addZCount(zombies: Int) {
+        let position = CGPoint(x: zCountButton!.position.x+32, y: zCountButton!.position.y-8)
+        add(message: "ZCounter:", position: position, fontSize: 34)
+        zCountLabel = childNode(withName: "ZCounter:") as? SKLabelNode
+        zCountLabel!.removeAllChildren()
+        zCountLabel!.fontName = "Menlo"
+        updateZombieCount(zombies: zombies)
     }
 
     func clearUI(_ oldState: HUDState) {
@@ -86,17 +100,12 @@ class HUD: SKNode {
         case .initial:
             break
         case .buildingTapped:
-            remove(message: HUDMessages.enterBuilding)
+            break
+        case .attackTapped:
+            remove(message: HUDMessages.attack)
             remove(message: HUDMessages.yes)
             remove(message: HUDMessages.no)
-            break
-        case .start:
-            remove(message: HUDMessages.tapToStart)
-            break
-        case .reload:
-            remove(message: HUDMessages.enterBuilding)
-            remove(message: HUDMessages.yes)
-            remove(message: HUDMessages.no)
+        default:
             break
         }
     }
@@ -138,23 +147,23 @@ class HUD: SKNode {
     func updateHUD(_ state: HUDState) {
         switch hudState {
         case .initial:
-
+            
             break
         case .buildingTapped:
-            add(message: HUDMessages.enterBuilding, position: .zero, fontSize: 40)
+            break
+        case .attackTapped:
+            add(message: HUDMessages.attack, position: .zero, fontSize: 40)
             add(message: HUDMessages.yes, position: CGPoint(x: -140, y: -100))
             add(message: HUDMessages.no, position: CGPoint(x: 130, y: -100))
-            break
-        case .start:
-            add(message: HUDMessages.tapToStart, position: .zero)
-            break
-        case .reload:
-            add(message: HUDMessages.enterBuilding, position: .zero, fontSize: 40)
-            add(message: HUDMessages.yes, position: CGPoint(x: -140, y: -100))
-            add(message: HUDMessages.no, position: CGPoint(x: 130, y: -100))
-            break
+        case .gameOver:
+            add(message: HUDMessages.gameOver, position: .zero, fontSize: 40)
         default:
             break
         }
+    }
+    
+    func updateZombieCount(zombies: Int) {
+        let zCount = String("\(zombies)")
+        zCountLabel?.text = zCount
     }
 }

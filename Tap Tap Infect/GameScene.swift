@@ -10,21 +10,23 @@ import SpriteKit
 import GameplayKit
 import UIKit
 
-enum Upgrades {
-    static var upgrade1: Int = 0
-    static var upgrade2: Int = 0
-    static var upgrade3: Int = 0
-    static var restarts: Int = 0
+enum Upgrades: Int {
+    case initial = 0, upgrade1, upgrade2, upgrade3
+}
+
+enum GameState: Int {
+    case overview = 0, upgrades, attacking, gameOver
 }
 
 class GameScene: SKScene {
+    
+    static var restarts: Int = 0
     
     var lastUpdateTimeInterval: TimeInterval = 0
     var deltaTime: TimeInterval = 0
     
     var cameraNode: SKCameraNode!
     var humansCount: Int = 0
-    var zombieCount: Int = 0
     var destroyedCount: Int = 0
     var brains: Int = 0
     
@@ -47,6 +49,20 @@ class GameScene: SKScene {
     var endTouch: CGPoint = .zero
     var spawnPoints: [CGPoint] = []
     
+    var zombieCount: Int = 0 {
+        didSet {
+            hud.updateZombieCount(zombies: zombieCount)
+        }
+    }
+    
+    var gameState: GameState = .overview {
+        didSet {
+            if gameState == .gameOver{
+                restart()
+            }
+        }
+    }
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -66,6 +82,9 @@ class GameScene: SKScene {
         }
         initialTouch = touch.location(in: self)
         movedTouch = initialTouch
+        if hud.hudState == .gameOver {
+            gameState = .gameOver
+        }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -95,21 +114,21 @@ class GameScene: SKScene {
             deltaTime = 0
         }
         lastUpdateTimeInterval = currentTime
+        checkGameOver()
         updateHUD()
-        setHumanSpawner()
-        tapZombie()
-        updateBuildings()
-        updateHumansAndZombies()
-        cleanUp()
+        if gameState == .overview {
+            setHumanSpawner()
+            updateHumansAndZombies()
+            cleanUp()
+        }
     }
     
-    func buildingBounceAndShake(building: SKTileMapNode) {
+    func buildingFlash(building: SKTileMapNode) {
         let decorationNode = building.childNode(withName: "buildingdeco") as! SKTileMapNode
         let fadeOut = SKAction.fadeAlpha(to: 0.5, duration: 0.5)
         let fadeIn = SKAction.fadeIn(withDuration: 0.5)
         decorationNode.run(SKAction.sequence([fadeOut,fadeIn]))
         building.run(SKAction.sequence([fadeOut,fadeIn]))
-        hud.hudState = .buildingTapped
     }
     
     func buttonTaps() {
@@ -130,6 +149,12 @@ class GameScene: SKScene {
         }
     }
     
+    func checkGameOver() {
+        if zombieCount == 0 && numZTaps == 0 {
+            hud.hudState = .gameOver
+        }
+    }
+    
     func cleanUp() {
         var indicesToClean: [Int] = []
         var indicesToSwap: [Int] = []
@@ -146,7 +171,7 @@ class GameScene: SKScene {
             for i in 0...indicesToClean.count-1 {
                 let human = HumanPop[indicesToClean[i]]
                 HumanPop.remove(at: indicesToClean[i])
-                PlayDeathAnimation(human)
+                playDeathAnimation(human)
                 humansCount -= 1
                 destroyedCount += 1
             }
@@ -171,7 +196,7 @@ class GameScene: SKScene {
             for i in 0...indicesToClean.count-1 {
                 let zombie = ZombiePop[indicesToClean[i]]
                 ZombiePop.remove(at: indicesToClean[i])
-                PlayDeathAnimation(zombie)
+                playDeathAnimation(zombie)
                 zombieCount -= 1
                 destroyedCount += 1
             }
@@ -225,13 +250,31 @@ class GameScene: SKScene {
         }
     }
     
-    func PlayDeathAnimation(_ human: Human) {
+    func playDeathAnimation(_ human: Human) {
         let particles = SKEmitterNode(fileNamed: "DeathAnimation")!
         particles.position = human.shape.position
         particles.zPosition = 10
         background.addChild(particles)
         particles.run(SKAction.removeFromParentAfterDelay(5.0))
         human.shape.run(SKAction.sequence([SKAction.scale(to: 0.0, duration: 0.5), SKAction.removeFromParent()]))
+    }
+    
+    func playBrainsAnimation(_ human: Human) {
+        if !human.wantsBrainz {
+            let particles = SKEmitterNode(fileNamed: "Brainz")!
+            particles.position = human.shape.position
+            particles.zPosition = 30
+            background.addChild(particles)
+            particles.run(SKAction.sequence([SKAction.removeFromParentAfterDelay(1),
+                SKAction.run { human.wantsBrainz = false }]))
+            human.wantsBrainz = true
+        }
+    }
+    
+    func restart() {
+        let newScene = SKScene(fileNamed: "GameScene.sks")
+        newScene!.scaleMode = .aspectFill
+        view?.presentScene(newScene!, transition: SKTransition.crossFade(withDuration: 2))
     }
     
     func setHumanSpawner() {
@@ -314,9 +357,11 @@ class GameScene: SKScene {
         cameraNode.constraints = [edgeConstraint]
         
         hud.setupNodes(size: view.frame.size)
+        hud.updateZombieCount(zombies: zombieCount)
+        hud.addZCount(zombies: zombieCount)
         cameraNode.addChild(hud)
         hud.position = .zero
-    }
+}
     
     func setupEdgeLoop() {
         let edgeLoop = SKPhysicsBody(edgeLoopFrom: obstaclesTileMap.frame)
@@ -334,7 +379,7 @@ class GameScene: SKScene {
     func spawnHuman(human: Human) {
         let spawnPoint = spawnPoints[Int.random(min: 0, max: unlockedSpawns)]
         let move = SKAction.move(to: spawnPoint, duration: 0)
-        let recolor = SKAction.fadeAlpha(to: 1, duration: 0.5)
+        let recolor = SKAction.fadeAlpha(by: 1, duration: 0.5)
         let spawnAction = SKAction.sequence([move,recolor,SKAction.run{human.walk()}])
         human.shape.run(spawnAction)
         humansCount += 1
@@ -371,7 +416,7 @@ class GameScene: SKScene {
             for human in HumanPop {
                 if human.isAlive {
                     if zombie.maxRange > (zombie.shape.position - human.shape.position).length(){
-                        human.runAway(zombiePosition: zombie.shape.position)
+                        human.react(zombie: zombie)
                         if zombie.closestHuman == 0 || (zombie.closestHuman >= (zombie.shape.position - human.shape.position).length()) {
                             zombie.closestHuman = (zombie.shape.position-human.shape.position).length()
                             target = human
@@ -382,6 +427,7 @@ class GameScene: SKScene {
             if target != nil {
                 if target!.canTurn {
                     zombie.chase(human: target!)
+                    playBrainsAnimation(zombie)
                 }
             } else {
                 zombie.closestHuman = 0
@@ -394,8 +440,7 @@ class GameScene: SKScene {
         var i = 0
         for building in buildingsTileMap {
             if building.contains(convert(initialTouch, to: buildings)) && building.contains(convert (endTouch, to: buildings)){
-                print("building\(i)")
-                buildingBounceAndShake(building: building)
+                buildingFlash(building: building)
                 initialTouch = .zero
                 endTouch = .zero
             }
@@ -404,8 +449,27 @@ class GameScene: SKScene {
     }
     
     func updateHUD() {
-        if hud.hudState == .initial {
+        switch hud.hudState {
+        case .buildingTapped:
+            break
+        case .initial:
+            tapZombie()
             buttonTaps()
+            updateBuildings()
+        case .attackTapped:
+            let touch = convert(initialTouch, to: hud)
+            if hud.childNode(withName: HUDMessages.yes)!.contains(touch){
+                hud.hudState = .initial
+                gameState = .attacking
+                initialTouch = .zero
+            } else if hud.childNode(withName: HUDMessages.no)!.contains(touch) {
+                hud.hudState = .initial
+                initialTouch = .zero
+            }
+            break
+        default:
+            break
         }
+
     }
 }
