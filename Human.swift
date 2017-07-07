@@ -17,14 +17,14 @@ enum HumanSettings {
     static var copChance: Int = 10
     static var humanMaxPop: Int = 50
     static var humanStartPop: Int = 10
-    static let maxRadius: Int = 10
+    static let maxRadius: Int = 15
     static var militaryChance: Int = 10
-    static let minRadius: Int = 6
+    static let minRadius: Int = 10
     static var numTapped: Int = 0
     static var spawnFreq: Int = 5
     static let turnTime: Int = 3
     static var zChance: Int = 50
-    static var scaleAmount: CGFloat = 0.3
+    static var scaleAmount: CGFloat = 0.4
 }
 
 class Human {
@@ -39,8 +39,6 @@ class Human {
     var category: Int = 0
     var type: Int = 0
     var closestHuman: CGFloat = 0
-    
-    var facing: CGVector = .zero
     
     var isAlive: Bool = true
     var canTurn: Bool = true
@@ -79,7 +77,6 @@ class Human {
         switch human.category {
         case humanType.cop.rawValue:
             human.takeDamage(damage)
-            takeDamage(human.damage)
             break
         case humanType.military.rawValue:
             human.takeDamage(damage)
@@ -90,7 +87,7 @@ class Human {
     }
     
     func becomeZombie() {
-        color = .red
+        color = SKColorWithRGBA(255 , g: 0, b: 0, a: 120)
         shape.fillColor = color
         isAlive = true
         canTurn = false
@@ -99,9 +96,10 @@ class Human {
         walk()
     }
     
-    func chase(human: Human) {
+    func chase(_ human: Human) {
         if isAlive && human.isAlive{
             shape.removeAction(forKey: "walk")
+            shape.removeAction(forKey: "run")
             if shape.action(forKey: "chase") == nil {
                 let offset = human.shape.position - shape.position
                 let direction = offset/offset.length()
@@ -113,7 +111,7 @@ class Human {
                 shape.run(SKAction.sequence([chase,clean,SKAction.run{ self.walk() }]), withKey: "chase")
             }
         }
-        if Int(closestHuman) <= radius + human.radius && shape.action(forKey: "attack") == nil {
+        if Int((human.shape.position - shape.position).length()) <= radius + human.radius && shape.action(forKey: "attack") == nil {
             let clean = SKAction.run { self.shape.removeAction(forKey: "attack") }
             let attack = SKAction.sequence([SKAction.run { self.attack(human: human) },
                                             SKAction.wait(forDuration: TimeInterval(HumanSettings.attackRate)), clean])
@@ -135,21 +133,19 @@ class Human {
         let shape = SKShapeNode(circleOfRadius: CGFloat(radius))
         switch category {
         case humanType.cop.rawValue:
-            color = .blue
+            color = SKColorWithRGBA(0 , g: 64, b: 128, a: 120)
             shape.fillColor = color
-            shape.strokeColor = #colorLiteral(red: 0.09019608051, green: 0, blue: 0.3019607961, alpha: 1)
             accent = SKSpriteNode(imageNamed: "cop")
         case humanType.military.rawValue:
-            color = .green
+            color = SKColorWithRGBA(0 , g: 128, b: 0, a: 120)
             shape.fillColor = color
-            shape.strokeColor = #colorLiteral(red: 0.1960784346, green: 0.3411764801, blue: 0.1019607857, alpha: 1)
             accent = SKSpriteNode(imageNamed: "military")
         default:
-            color = .white
+            color = SKColorWithRGBA(255 , g: 255, b: 255, a: 120)
             shape.fillColor = color
-            shape.strokeColor = #colorLiteral(red: 0.2549019754, green: 0.2745098174, blue: 0.3019607961, alpha: 1)
             accent = SKSpriteNode(imageNamed: "civilian")
         }
+        shape.strokeColor = .clear
         shape.position = CGPoint.zero
         shape.zPosition = 5
         shape.alpha = 0
@@ -163,6 +159,21 @@ class Human {
         return shape
     }
     
+    func moveToPoint(point: CGPoint) {
+        shape.removeAction(forKey: "walk")
+        shape.removeAction(forKey: "run")
+        if !shape.hasActions() {
+            let distance = point.length()
+            let direction = point/distance
+            let angle = direction.angle
+            accent.run(SKAction.rotate(toAngle: angle, duration: 0.3))
+            let vector = CGVector(dx: 6*direction.x*speed, dy: 6*direction.y*speed)
+            let run = SKAction.move(by: vector, duration: 3)
+            let clean = SKAction.run { self.shape.removeAction(forKey: "run")}
+            shape.run(SKAction.sequence([run,clean,SKAction.run{ self.walk() }]), withKey: "run")
+        }
+    }
+    
     func position(position: CGPoint) {
         shape.position = position
     }
@@ -171,6 +182,8 @@ class Human {
         switch category {
         case humanType.military.rawValue:
             shoot(zombie: zombie)
+        case humanType.cop.rawValue:
+            chase(zombie)
         default:
             runAway(zombiePosition: zombie.shape.position)
         }
@@ -194,12 +207,11 @@ class Human {
                 let offset = zombiePosition - shape.position
                 let direction = offset/offset.length()
                 let angle = direction.angle
-                accent.run(SKAction.rotate(toAngle: -1*angle, duration: 0.3))
+                accent.run(SKAction.rotate(toAngle: angle+π, duration: 0.3))
                 let vector = CGVector(dx: -2*direction.x*speed,
                                       dy: -2*direction.y*speed)
-                facing = vector
                 let run = SKAction.move(by: vector, duration: 1)
-                let clean = SKAction.run { self.shape.removeAllActions() }
+                let clean = SKAction.run { self.shape.removeAction(forKey: "runAway") }
                 shape.run(SKAction.sequence([run,clean,SKAction.run{ self.walk() }]), withKey: "runAway")
             }
         }
@@ -238,12 +250,12 @@ class Human {
     }
     
     func setRadius() {
-        if 3*health > HumanSettings.maxRadius {
+        if 4*health > HumanSettings.maxRadius {
             radius = HumanSettings.maxRadius
-        } else if 3*health < HumanSettings.minRadius {
+        } else if 4*health < HumanSettings.minRadius {
             radius = HumanSettings.minRadius
         } else {
-            radius = 3*health
+            radius = 4*health
         }
     }
     
@@ -257,19 +269,22 @@ class Human {
             if bullet.action(forKey: "shoot") == nil {
                 let offset = zombie.shape.position - shape.position
                 let direction = offset/offset.length()
+                let angle = direction.angle
+                accent.run(SKAction.rotate(toAngle: angle, duration: 0.2))
                 spawnBullet(direction: direction)
                 let travelTime = offset.length()/HumanSettings.bulletSpeed
                 let travel = SKAction.move(to: zombie.shape.position, duration: TimeInterval(travelTime))
                 let removeBullet = SKAction.fadeOut(withDuration: 0.1)
                 let clean = SKAction.run { self.shape.removeAction(forKey: "shoot")}
-                bullet.run(SKAction.sequence([travel,removeBullet,SKAction.run {                  zombie.takeDamage(self.damage) },clean,SKAction.run{ self.walk() }]), withKey: "shoot")
+                let wait = SKAction.wait(forDuration: 0.5)
+                bullet.run(SKAction.sequence([travel,removeBullet,SKAction.run {                  zombie.takeDamage(self.damage) },wait,clean,SKAction.run{ self.walk() }]), withKey: "shoot")
             }
         }
     }
     
     func spawnBullet(direction: CGPoint) {
-        let spawnPoint = CGPoint(x: shape.position.x,
-                                 y: shape.position.y)
+        let spawnPoint = CGPoint(x: shape.position.x + direction.x*CGFloat(radius),
+                                 y: shape.position.y + direction.y*CGFloat(radius))
         bullet.run(SKAction.sequence([SKAction.move(to: spawnPoint, duration: 0), SKAction.fadeIn(withDuration: 0)]))
         print("bullet spawned")
     }

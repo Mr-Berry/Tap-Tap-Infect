@@ -21,15 +21,17 @@ enum HUDMessages {
     static let tapToStart = "Tap to Start"
     static let win = "You Win!"
     static let lose = "Out Of Time!"
-    static let nextLevel = "Tap for Next Level"
+    static let reset = "Would you like to reset?"
+    static let resetText = "You lose everything but can use your brainz"
     static let gameOver = "Tap to Play Again"
     static let attack = "Make Zombies Attack?"
-    static let yes = "Attack!"
+    static let yesAttack = "Attack!"
+    static let yes = "Gimme Brainz!"
     static let no = "Not now!"
 }
 
 enum HUDState: Int {
-    case initial = 0, buildingTapped, attackTapped, gameOver
+    case initial = 0, buildingTapped, attackTapped, reset, gameOver
 }
 
 class HUD: SKNode {
@@ -103,6 +105,11 @@ class HUD: SKNode {
             break
         case .attackTapped:
             remove(message: HUDMessages.attack)
+            remove(message: HUDMessages.yesAttack)
+            remove(message: HUDMessages.no)
+        case .reset:
+            remove(message: HUDMessages.reset)
+            remove(message: HUDMessages.resetText)
             remove(message: HUDMessages.yes)
             remove(message: HUDMessages.no)
         default:
@@ -153,12 +160,15 @@ class HUD: SKNode {
             break
         case .attackTapped:
             add(message: HUDMessages.attack, position: .zero, fontSize: 40)
-            add(message: HUDMessages.yes, position: CGPoint(x: -140, y: -100))
+            add(message: HUDMessages.yesAttack, position: CGPoint(x: -140, y: -100))
             add(message: HUDMessages.no, position: CGPoint(x: 130, y: -100))
+        case .reset:
+            add(message: HUDMessages.reset, position: CGPoint(x: 0, y: 50), fontSize: 40)
+            add(message: HUDMessages.resetText, position: .zero, fontSize: 20)
+            add(message: HUDMessages.yes, position: CGPoint(x: -140, y: -50), fontSize: 30)
+            add(message: HUDMessages.no, position: CGPoint(x: 130, y: -50), fontSize: 30)
         case .gameOver:
             add(message: HUDMessages.gameOver, position: .zero, fontSize: 40)
-        default:
-            break
         }
     }
     

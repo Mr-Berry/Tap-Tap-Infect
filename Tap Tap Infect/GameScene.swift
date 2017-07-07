@@ -49,11 +49,7 @@ class GameScene: SKScene {
     var endTouch: CGPoint = .zero
     var spawnPoints: [CGPoint] = []
     
-    var zombieCount: Int = 0 {
-        didSet {
-            hud.updateZombieCount(zombies: zombieCount)
-        }
-    }
+    var zombieCount: Int = 0
     
     var gameState: GameState = .overview {
         didSet {
@@ -72,8 +68,8 @@ class GameScene: SKScene {
         setupBuildingPhysics()
         setupObstaclePhysics()
         setupEdgeLoop()
-        setupHudAndCamera()
         createHumans()
+        setupHudAndCamera()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -84,6 +80,12 @@ class GameScene: SKScene {
         movedTouch = initialTouch
         if hud.hudState == .gameOver {
             gameState = .gameOver
+        } else if gameState == .overview {
+            if initialTouch != .zero {
+                for zombie in ZombiePop {
+                    zombie.moveToPoint(point: convert(initialTouch, to: zombie.shape))
+                }
+            }
         }
     }
     
@@ -135,15 +137,13 @@ class GameScene: SKScene {
         let firstTouch = convert(initialTouch, to: hud)
         let lastTouch = convert(endTouch, to: hud)
         if hud.resetButton!.contains(firstTouch) && hud.resetButton!.contains(lastTouch) {
-            print("reset!")
+            hud.hudState = .reset
             initialTouch = .zero
             endTouch = .zero
         } else if hud.upgradesButton!.contains(firstTouch) && hud.upgradesButton!.contains(lastTouch) {
-            print("upgrade!")
             initialTouch = .zero
             endTouch = .zero
         } else if hud.zCountButton!.contains(firstTouch) && hud.zCountButton!.contains(lastTouch){
-            print("zombieCount!")
             initialTouch = .zero
             endTouch = .zero
         }
@@ -256,7 +256,7 @@ class GameScene: SKScene {
         particles.zPosition = 10
         background.addChild(particles)
         particles.run(SKAction.removeFromParentAfterDelay(5.0))
-        human.shape.run(SKAction.sequence([SKAction.scale(to: 0.0, duration: 0.5), SKAction.removeFromParent()]))
+        human.shape.run(SKAction.sequence([SKAction.fadeOut(withDuration: 0.5), SKAction.removeFromParent()]))
     }
     
     func playBrainsAnimation(_ human: Human) {
@@ -272,7 +272,7 @@ class GameScene: SKScene {
     }
     
     func restart() {
-        let newScene = SKScene(fileNamed: "GameScene.sks")
+        let newScene = SKScene(fileNamed: "GameScene.sks") as? GameScene
         newScene!.scaleMode = .aspectFill
         view?.presentScene(newScene!, transition: SKTransition.crossFade(withDuration: 2))
     }
@@ -357,9 +357,9 @@ class GameScene: SKScene {
         cameraNode.constraints = [edgeConstraint]
         
         hud.setupNodes(size: view.frame.size)
+        cameraNode.addChild(hud)
         hud.updateZombieCount(zombies: zombieCount)
         hud.addZCount(zombies: zombieCount)
-        cameraNode.addChild(hud)
         hud.position = .zero
 }
     
@@ -426,7 +426,7 @@ class GameScene: SKScene {
             }
             if target != nil {
                 if target!.canTurn {
-                    zombie.chase(human: target!)
+                    zombie.chase(target!)
                     playBrainsAnimation(zombie)
                 }
             } else {
@@ -441,7 +441,6 @@ class GameScene: SKScene {
         for building in buildingsTileMap {
             if building.contains(convert(initialTouch, to: buildings)) && building.contains(convert (endTouch, to: buildings)){
                 buildingFlash(building: building)
-                initialTouch = .zero
                 endTouch = .zero
             }
             i+=1
@@ -449,6 +448,7 @@ class GameScene: SKScene {
     }
     
     func updateHUD() {
+        hud.updateZombieCount(zombies: zombieCount)
         switch hud.hudState {
         case .buildingTapped:
             break
@@ -456,9 +456,18 @@ class GameScene: SKScene {
             tapZombie()
             buttonTaps()
             updateBuildings()
-        case .attackTapped:
+        case .reset:
             let touch = convert(initialTouch, to: hud)
             if hud.childNode(withName: HUDMessages.yes)!.contains(touch){
+                restart()
+            } else if hud.childNode(withName: HUDMessages.no)!.contains(touch) {
+                hud.hudState = .initial
+                gameState = .overview
+                initialTouch = .zero
+            }
+        case .attackTapped:
+            let touch = convert(initialTouch, to: hud)
+            if hud.childNode(withName: HUDMessages.yesAttack)!.contains(touch){
                 hud.hudState = .initial
                 gameState = .attacking
                 initialTouch = .zero
