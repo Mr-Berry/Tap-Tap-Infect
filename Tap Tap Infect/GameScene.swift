@@ -51,13 +51,7 @@ class GameScene: SKScene {
     
     var zombieCount: Int = 0
     
-    var gameState: GameState = .overview {
-        didSet {
-            if gameState == .gameOver{
-                restart()
-            }
-        }
-    }
+    var gameState: GameState = .overview
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -271,6 +265,10 @@ class GameScene: SKScene {
         }
     }
     
+    func playShoutAnimation(_ human: Human) {
+    
+    }
+    
     func restart() {
         let newScene = SKScene(fileNamed: "GameScene.sks") as? GameScene
         newScene!.scaleMode = .aspectFill
@@ -358,7 +356,6 @@ class GameScene: SKScene {
         
         hud.setupNodes(size: view.frame.size)
         cameraNode.addChild(hud)
-        hud.updateZombieCount(zombies: zombieCount)
         hud.addZCount(zombies: zombieCount)
         hud.position = .zero
 }
@@ -377,7 +374,16 @@ class GameScene: SKScene {
     }
     
     func spawnHuman(human: Human) {
-        let spawnPoint = spawnPoints[Int.random(min: 0, max: unlockedSpawns)]
+        var spawn = 0
+        switch human.category {
+        case humanType.cop.rawValue:
+            spawn = Int.random(min: 1, max: unlockedSpawns)
+        case humanType.military.rawValue:
+            spawn = 3
+        default:
+            spawn = Int.random(min: 0, max: unlockedSpawns)
+        }
+        let spawnPoint = spawnPoints[spawn]
         let move = SKAction.move(to: spawnPoint, duration: 0)
         let recolor = SKAction.fadeAlpha(by: 1, duration: 0.5)
         let spawnAction = SKAction.sequence([move,recolor,SKAction.run{human.walk()}])
@@ -449,6 +455,7 @@ class GameScene: SKScene {
     
     func updateHUD() {
         hud.updateZombieCount(zombies: zombieCount)
+        let touch = convert(initialTouch, to: hud)
         switch hud.hudState {
         case .buildingTapped:
             break
@@ -457,16 +464,15 @@ class GameScene: SKScene {
             buttonTaps()
             updateBuildings()
         case .reset:
-            let touch = convert(initialTouch, to: hud)
             if hud.childNode(withName: HUDMessages.yes)!.contains(touch){
-                restart()
+                hud.hudState = .upgrading
+                gameState = .gameOver
             } else if hud.childNode(withName: HUDMessages.no)!.contains(touch) {
                 hud.hudState = .initial
                 gameState = .overview
                 initialTouch = .zero
             }
         case .attackTapped:
-            let touch = convert(initialTouch, to: hud)
             if hud.childNode(withName: HUDMessages.yesAttack)!.contains(touch){
                 hud.hudState = .initial
                 gameState = .attacking
@@ -475,7 +481,10 @@ class GameScene: SKScene {
                 hud.hudState = .initial
                 initialTouch = .zero
             }
-            break
+        case .upgrading:
+            if hud.upgradesMenu.childNode(withName: "upgradesDone")!.contains(touch) {
+                hud.hudState = .initial
+            }
         default:
             break
         }

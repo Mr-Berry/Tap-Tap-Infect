@@ -31,7 +31,7 @@ enum HUDMessages {
 }
 
 enum HUDState: Int {
-    case initial = 0, buildingTapped, attackTapped, reset, gameOver
+    case initial = 0, buildingTapped, attackTapped, reset, upgrading, gameOver
 }
 
 class HUD: SKNode {
@@ -44,6 +44,8 @@ class HUD: SKNode {
     var upgradesButton: Button?
     var zCountButton: Button?
     var brainCountButton: Button?
+    
+    var upgradesMenu: SKShapeNode = SKShapeNode()
     
     var zCountLabel: SKLabelNode?
     var brainCountLabel: SKLabelNode?
@@ -112,9 +114,17 @@ class HUD: SKNode {
             remove(message: HUDMessages.resetText)
             remove(message: HUDMessages.yes)
             remove(message: HUDMessages.no)
+        case .upgrading:
+            hideUpgradesMenu()
         default:
             break
         }
+    }
+    
+    func hideUpgradesMenu() {
+        let scale = SKAction.scale(to: 0, duration: 0.5)
+        let fade = SKAction.fadeOut(withDuration: 0.5)
+        upgradesMenu.run(SKAction.group([scale,fade]))
     }
     
     func remove(message: String) {
@@ -144,6 +154,45 @@ class HUD: SKNode {
     
     func setupNodes(size: CGSize) {
         setupButtons(size: size)
+        setupUpgradesMenu(size: size)
+    }
+    
+    func setupUpgradesMenu(size: CGSize) {
+        let buttonSize = CGSize(width: size.height*0.4, height: size.width*0.4)
+        let button1 = SKShapeNode(rectOf: buttonSize)
+        button1.fillTexture = SKTexture(imageNamed: "rpgTile133")
+        button1.fillColor = .white
+        button1.strokeColor = .clear
+        button1.name = "upgradeButton1"
+        let button2 = SKShapeNode(rectOf: buttonSize)
+        button2.fillTexture = SKTexture(imageNamed: "rpgTile133")
+        button2.fillColor = .white
+        button2.strokeColor = .clear
+        button2.name = "upgradeButton2"
+        let button3 = SKShapeNode(rectOf: CGSize(width: buttonSize.height*0.5, height: buttonSize.width*0.5))
+        button3.fillTexture = SKTexture(imageNamed: "rpgTile133")
+        button3.fillColor = .red
+        button3.strokeColor = .clear
+        button3.name = "upgradesDone"
+        upgradesMenu = SKShapeNode(rectOf: CGSize(width: size.width*3, height: size.height*3))
+        upgradesMenu.fillTexture = SKTexture(imageNamed: "whitePuff10")
+        upgradesMenu.fillColor = .black
+        upgradesMenu.strokeColor = .clear
+        upgradesMenu.zPosition = 110
+        upgradesMenu.addChild(button1)
+        button1.position = CGPoint(x: -0.25*size.width, y: 0)
+        upgradesMenu.addChild(button2)
+        button2.position = CGPoint(x: 0.25*size.width, y: 0)
+        upgradesMenu.addChild(button3)
+        button3.position = CGPoint(x: 0, y: -1*buttonSize.width)
+        addChild(upgradesMenu)
+        upgradesMenu.setScale(0)
+    }
+    
+    func showUpgradesMenu() {
+        let scale = SKAction.scale(to: 1, duration: 0.5)
+        let fade = SKAction.fadeIn(withDuration: 0.5)
+        upgradesMenu.run(SKAction.group([scale,fade]))
     }
     
     func updateHUDState(from: HUDState, to: HUDState) {
@@ -169,11 +218,18 @@ class HUD: SKNode {
             add(message: HUDMessages.no, position: CGPoint(x: 130, y: -50), fontSize: 30)
         case .gameOver:
             add(message: HUDMessages.gameOver, position: .zero, fontSize: 40)
+        case .upgrading:
+            showUpgradesMenu()
         }
     }
     
     func updateZombieCount(zombies: Int) {
         let zCount = String("\(zombies)")
-        zCountLabel?.text = zCount
+        zCountLabel!.text = zCount
+    }
+    
+    func updateBrainCount(brainz: Int) {
+        let bCount = String("\(brainz)")
+        zCountLabel!.text = bCount
     }
 }

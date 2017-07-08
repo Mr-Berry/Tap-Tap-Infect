@@ -57,7 +57,7 @@ class Human {
     init(category: Int, type: Int) {
         setHealth(category: category, type: type)
         setRadius()
-        speed = CGFloat(30/health)
+        speed = CGFloat(40/health)
         shape = initShape(category: category)
         setRange()
         self.category = category
@@ -133,15 +133,15 @@ class Human {
         let shape = SKShapeNode(circleOfRadius: CGFloat(radius))
         switch category {
         case humanType.cop.rawValue:
-            color = SKColorWithRGBA(0 , g: 64, b: 128, a: 120)
+            color = SKColorWithRGBA(0 , g: 64, b: 128, a: 100)
             shape.fillColor = color
             accent = SKSpriteNode(imageNamed: "cop")
         case humanType.military.rawValue:
-            color = SKColorWithRGBA(0 , g: 128, b: 0, a: 120)
+            color = SKColorWithRGBA(0 , g: 128, b: 0, a: 100)
             shape.fillColor = color
             accent = SKSpriteNode(imageNamed: "military")
         default:
-            color = SKColorWithRGBA(255 , g: 255, b: 255, a: 120)
+            color = SKColorWithRGBA(255 , g: 255, b: 255, a: 100)
             shape.fillColor = color
             accent = SKSpriteNode(imageNamed: "civilian")
         }
@@ -286,7 +286,6 @@ class Human {
         let spawnPoint = CGPoint(x: shape.position.x + direction.x*CGFloat(radius),
                                  y: shape.position.y + direction.y*CGFloat(radius))
         bullet.run(SKAction.sequence([SKAction.move(to: spawnPoint, duration: 0), SKAction.fadeIn(withDuration: 0)]))
-        print("bullet spawned")
     }
     
     func takeDamage(_ damage: Int) {
