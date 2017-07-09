@@ -24,6 +24,13 @@
 		1D8FD2631EF5CB8100C29815 /* Vector3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FD2571EF5CB8100C29815 /* Vector3.swift */; };
 		1D8FD2651EF5F39C00C29815 /* Human.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8FD2641EF5F39C00C29815 /* Human.swift */; };
 		1DBF7EA51F06FF6E00E8CB83 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1DBF7EA31F06FF6E00E8CB83 /* Assets.xcassets */; };
+		1DCD16A21F11A2A50036A972 /* Splat.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1DCD16A11F11A2A50036A972 /* Splat.sks */; };
+		1DCD16A41F11D06C0036A972 /* zMusic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1DCD16A31F11D06B0036A972 /* zMusic.mp3 */; };
+		1DCD16A81F11D09B0036A972 /* brains.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1DCD16A51F11D09B0036A972 /* brains.wav */; };
+		1DCD16A91F11D09B0036A972 /* brains2.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1DCD16A61F11D09B0036A972 /* brains2.wav */; };
+		1DCD16AA1F11D09B0036A972 /* brains3.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1DCD16A71F11D09B0036A972 /* brains3.wav */; };
+		1DCD16AC1F11D0D30036A972 /* groan.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1DCD16AB1F11D0D30036A972 /* groan.wav */; };
+		1DCD16AE1F11D0EA0036A972 /* rar.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1DCD16AD1F11D0EA0036A972 /* rar.wav */; };
 		1DCE17FB1EFEEF5700554C4A /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCE17FA1EFEEF5700554C4A /* Extensions.swift */; };
 		1DCE17FD1EFEEF6000554C4A /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCE17FC1EFEEF6000554C4A /* Types.swift */; };
 		1DCE17FF1EFF514400554C4A /* HUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCE17FE1EFF514400554C4A /* HUD.swift */; };
@@ -57,6 +64,13 @@
 		1D8FD2571EF5CB8100C29815 /* Vector3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vector3.swift; sourceTree = "<group>"; };
 		1D8FD2641EF5F39C00C29815 /* Human.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Human.swift; path = ../Human.swift; sourceTree = "<group>"; };
 		1DBF7EA31F06FF6E00E8CB83 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1DCD16A11F11A2A50036A972 /* Splat.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Splat.sks; sourceTree = "<group>"; };
+		1DCD16A31F11D06B0036A972 /* zMusic.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = zMusic.mp3; sourceTree = "<group>"; };
+		1DCD16A51F11D09B0036A972 /* brains.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = brains.wav; sourceTree = "<group>"; };
+		1DCD16A61F11D09B0036A972 /* brains2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = brains2.wav; sourceTree = "<group>"; };
+		1DCD16A71F11D09B0036A972 /* brains3.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = brains3.wav; sourceTree = "<group>"; };
+		1DCD16AB1F11D0D30036A972 /* groan.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = groan.wav; sourceTree = "<group>"; };
+		1DCD16AD1F11D0EA0036A972 /* rar.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rar.wav; sourceTree = "<group>"; };
 		1DCE17FA1EFEEF5700554C4A /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		1DCE17FC1EFEEF6000554C4A /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		1DCE17FE1EFF514400554C4A /* HUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HUD.swift; sourceTree = "<group>"; };
@@ -121,6 +135,7 @@
 				1D3C46E41F0B147A00876582 /* DeathAnimation.sks */,
 				1DE48A871F0EED5B00244A88 /* Brainz.sks */,
 				1DE48A891F0EEF1500244A88 /* Shout.sks */,
+				1DCD16A11F11A2A50036A972 /* Splat.sks */,
 			);
 			name = Particles;
 			path = ..;
@@ -169,6 +184,12 @@
 		1DDB065B1EECC4B7002B0707 /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
+				1DCD16A31F11D06B0036A972 /* zMusic.mp3 */,
+				1DCD16AD1F11D0EA0036A972 /* rar.wav */,
+				1DCD16AB1F11D0D30036A972 /* groan.wav */,
+				1DCD16A51F11D09B0036A972 /* brains.wav */,
+				1DCD16A61F11D09B0036A972 /* brains2.wav */,
+				1DCD16A71F11D09B0036A972 /* brains3.wav */,
 			);
 			name = Sounds;
 			sourceTree = "<group>";
@@ -233,14 +254,21 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DCD16A91F11D09B0036A972 /* brains2.wav in Resources */,
 				1D721A641EFB33EE00CC6F5C /* TileSets.sks in Resources */,
 				1DDB064E1EECC0B4002B0707 /* Main.storyboard in Resources */,
+				1DCD16A21F11A2A50036A972 /* Splat.sks in Resources */,
 				1DDB06451EECC0B4002B0707 /* GameScene.sks in Resources */,
+				1DCD16AA1F11D09B0036A972 /* brains3.wav in Resources */,
 				1DE48A8A1F0EEF1500244A88 /* Shout.sks in Resources */,
 				1DE48A881F0EED5B00244A88 /* Brainz.sks in Resources */,
 				1DDB06501EECC0B4002B0707 /* Assets.xcassets in Resources */,
+				1DCD16A81F11D09B0036A972 /* brains.wav in Resources */,
 				1DDB06531EECC0B4002B0707 /* LaunchScreen.storyboard in Resources */,
 				1DBF7EA51F06FF6E00E8CB83 /* Assets.xcassets in Resources */,
+				1DCD16AE1F11D0EA0036A972 /* rar.wav in Resources */,
+				1DCD16AC1F11D0D30036A972 /* groan.wav in Resources */,
+				1DCD16A41F11D06C0036A972 /* zMusic.mp3 in Resources */,
 				1DDB06471EECC0B4002B0707 /* Actions.sks in Resources */,
 				1D3C46E51F0B147A00876582 /* DeathAnimation.sks in Resources */,
 			);

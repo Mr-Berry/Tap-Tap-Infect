@@ -21,6 +21,13 @@ enum GameState: Int {
 class GameScene: SKScene {
     
     static var restarts: Int = 0
+
+    let brainzSound = [SKAction.playSoundFileNamed("brains.wav", waitForCompletion: false),
+                       SKAction.playSoundFileNamed("brains2.wav", waitForCompletion: false),
+                       SKAction.playSoundFileNamed("brains3.wav", waitForCompletion: false)]
+    
+    let ambientSound = [SKAction.playSoundFileNamed("groan.wav", waitForCompletion: false),
+                       SKAction.playSoundFileNamed("rar.wav", waitForCompletion: false)]
     
     var lastUpdateTimeInterval: TimeInterval = 0
     var deltaTime: TimeInterval = 0
@@ -43,7 +50,7 @@ class GameScene: SKScene {
     
     var numZTaps: Int = 5
     var unlockedSpawns: Int = 3
-    let cameraMoveSpeed: Float = 10.0
+    let cameraMoveSpeed: Float = 15.0
     var initialTouch: CGPoint = .zero
     var movedTouch: CGPoint = .zero
     var endTouch: CGPoint = .zero
@@ -64,6 +71,7 @@ class GameScene: SKScene {
         setupEdgeLoop()
         createHumans()
         setupHudAndCamera()
+        playBackgroundMusic("zMusic.mp3")
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -73,13 +81,7 @@ class GameScene: SKScene {
         initialTouch = touch.location(in: self)
         movedTouch = initialTouch
         if hud.hudState == .gameOver {
-            gameState = .gameOver
-        } else if gameState == .overview {
-            if initialTouch != .zero {
-                for zombie in ZombiePop {
-                    zombie.moveToPoint(point: convert(initialTouch, to: zombie.shape))
-                }
-            }
+            restart()
         }
     }
     
@@ -101,6 +103,13 @@ class GameScene: SKScene {
             return
         }
         endTouch = touch.location(in: self)
+        if gameState == .overview {
+            if endTouch != .zero && endTouch == initialTouch {
+                for zombie in ZombiePop {
+                    zombie.moveToPoint(point: convert(endTouch, to: zombie.shape))
+                }
+            }
+        }
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -112,11 +121,13 @@ class GameScene: SKScene {
         lastUpdateTimeInterval = currentTime
         checkGameOver()
         updateHUD()
+        playRandomSound()
         if gameState == .overview {
             setHumanSpawner()
             updateHumansAndZombies()
             cleanUp()
         }
+        hud.updateZombieCount(zombies: ZombiePop.count)
     }
     
     func buildingFlash(building: SKTileMapNode) {
@@ -134,9 +145,10 @@ class GameScene: SKScene {
             hud.hudState = .reset
             initialTouch = .zero
             endTouch = .zero
-        } else if hud.upgradesButton!.contains(firstTouch) && hud.upgradesButton!.contains(lastTouch) {
+        } else if hud.upgradesButton!.contains(firstTouch) && hud.upgradesButton!.contains(lastTouch){
             initialTouch = .zero
             endTouch = .zero
+            hud.hudState = .upgrading
         } else if hud.zCountButton!.contains(firstTouch) && hud.zCountButton!.contains(lastTouch){
             initialTouch = .zero
             endTouch = .zero
@@ -144,7 +156,7 @@ class GameScene: SKScene {
     }
     
     func checkGameOver() {
-        if zombieCount == 0 && numZTaps == 0 {
+        if zombieCount == 0 && numZTaps == 0 && brains == 0 {
             hud.hudState = .gameOver
         }
     }
@@ -168,6 +180,9 @@ class GameScene: SKScene {
                 playDeathAnimation(human)
                 humansCount -= 1
                 destroyedCount += 1
+                if Int.random(min: 1, max: 100) < HumanSettings.brainChance {
+                    brains += 1
+                }
             }
         }
         if !indicesToSwap.isEmpty {
@@ -201,14 +216,15 @@ class GameScene: SKScene {
         switch human.category {
         case humanType.military.rawValue:
             human.category = humanType.cop.rawValue
-            human.color = .blue
+            human.color = SKColorWithRGBA(0 , g: 64, b: 128, a: 100)
             human.shape.fillColor = human.color
         case humanType.cop.rawValue:
             human.category = humanType.civilian.rawValue
-            human.color = .white
+            human.color = SKColorWithRGBA(255 , g: 255, b: 255, a: 100)
             human.shape.fillColor = human.color
         default:
             human.becomeZombie()
+            zombieCount += 1
         }
     }
     
@@ -244,6 +260,35 @@ class GameScene: SKScene {
         }
     }
     
+    func playBackgroundMusic(_ name: String) {
+        if let backgroundMusic = childNode(withName: "backgroundMusic") {
+            backgroundMusic.removeFromParent()
+        }
+        let music = SKAudioNode(fileNamed: name)
+        music.autoplayLooped = true
+        addChild(music)
+    }
+    
+    func playBrainsAnimation(_ zombie: Human) {
+        if !zombie.wantsBrainz {
+            let particles = SKEmitterNode(fileNamed: "Brainz")!
+            particles.position = zombie.shape.position
+            particles.zPosition = 30
+            background.addChild(particles)
+            particles.run(SKAction.sequence([SKAction.removeFromParentAfterDelay(1),
+                                             SKAction.run { zombie.wantsBrainz = false }]))
+            zombie.wantsBrainz = true
+        }
+    }
+    
+    func playBrainsSound() {
+        if self.action(forKey: "brainSound") == nil && ZombiePop.count > 0{
+            let randomNum = Int.random(brainzSound.count)
+            let wait = SKAction.wait(forDuration: TimeInterval(randomNum*8))
+            run(SKAction.sequence([brainzSound[randomNum],wait,SKAction.removeFromParent()]), withKey: "brainSound")
+        }
+    }
+    
     func playDeathAnimation(_ human: Human) {
         let particles = SKEmitterNode(fileNamed: "DeathAnimation")!
         particles.position = human.shape.position
@@ -253,24 +298,28 @@ class GameScene: SKScene {
         human.shape.run(SKAction.sequence([SKAction.fadeOut(withDuration: 0.5), SKAction.removeFromParent()]))
     }
     
-    func playBrainsAnimation(_ human: Human) {
-        if !human.wantsBrainz {
-            let particles = SKEmitterNode(fileNamed: "Brainz")!
-            particles.position = human.shape.position
-            particles.zPosition = 30
-            background.addChild(particles)
-            particles.run(SKAction.sequence([SKAction.removeFromParentAfterDelay(1),
-                SKAction.run { human.wantsBrainz = false }]))
-            human.wantsBrainz = true
+    func playRandomSound() {
+        if self.action(forKey: "ambient") == nil && ZombiePop.count > 0{
+            let randomNum = Int.random(ambientSound.count)
+            let wait = SKAction.wait(forDuration: TimeInterval(randomNum*8))
+            run(SKAction.sequence([ambientSound[randomNum],wait,SKAction.removeFromParent()]), withKey: "ambient")
         }
     }
     
     func playShoutAnimation(_ human: Human) {
-    
+        if !human.isScreaming {
+            let particles = SKEmitterNode(fileNamed: "Shout")!
+            particles.position = human.shape.position
+            particles.zPosition = 30
+            background.addChild(particles)
+            particles.run(SKAction.sequence([SKAction.removeFromParentAfterDelay(1),
+                                             SKAction.run { human.isScreaming = false }]))
+            human.isScreaming = true
+        }
     }
     
     func restart() {
-        let newScene = SKScene(fileNamed: "GameScene.sks") as? GameScene
+        let newScene = SKScene(fileNamed: "GameScene.sks")
         newScene!.scaleMode = .aspectFill
         view?.presentScene(newScene!, transition: SKTransition.crossFade(withDuration: 2))
     }
@@ -329,6 +378,7 @@ class GameScene: SKScene {
                     node.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: tile.size.width,
                                                                         height: tile.size.height*0.5))
                     node.physicsBody?.isDynamic = false
+                    node.physicsBody?.friction = 0
                     obstaclesTileMap.addChild(node)
                 }
             }
@@ -356,7 +406,6 @@ class GameScene: SKScene {
         
         hud.setupNodes(size: view.frame.size)
         cameraNode.addChild(hud)
-        hud.addZCount(zombies: zombieCount)
         hud.position = .zero
 }
     
@@ -423,6 +472,9 @@ class GameScene: SKScene {
                 if human.isAlive {
                     if zombie.maxRange > (zombie.shape.position - human.shape.position).length(){
                         human.react(zombie: zombie)
+                        if human.category == humanType.civilian.rawValue {
+                            playShoutAnimation(human)
+                        }
                         if zombie.closestHuman == 0 || (zombie.closestHuman >= (zombie.shape.position - human.shape.position).length()) {
                             zombie.closestHuman = (zombie.shape.position-human.shape.position).length()
                             target = human
@@ -433,6 +485,7 @@ class GameScene: SKScene {
             if target != nil {
                 if target!.canTurn {
                     zombie.chase(target!)
+                    playBrainsSound()
                     playBrainsAnimation(zombie)
                 }
             } else {
@@ -454,11 +507,8 @@ class GameScene: SKScene {
     }
     
     func updateHUD() {
-        hud.updateZombieCount(zombies: zombieCount)
         let touch = convert(initialTouch, to: hud)
         switch hud.hudState {
-        case .buildingTapped:
-            break
         case .initial:
             tapZombie()
             buttonTaps()
@@ -467,27 +517,22 @@ class GameScene: SKScene {
             if hud.childNode(withName: HUDMessages.yes)!.contains(touch){
                 hud.hudState = .upgrading
                 gameState = .gameOver
+                initialTouch = .zero
             } else if hud.childNode(withName: HUDMessages.no)!.contains(touch) {
                 hud.hudState = .initial
                 gameState = .overview
                 initialTouch = .zero
             }
-        case .attackTapped:
-            if hud.childNode(withName: HUDMessages.yesAttack)!.contains(touch){
-                hud.hudState = .initial
-                gameState = .attacking
-                initialTouch = .zero
-            } else if hud.childNode(withName: HUDMessages.no)!.contains(touch) {
-                hud.hudState = .initial
-                initialTouch = .zero
-            }
         case .upgrading:
             if hud.upgradesMenu.childNode(withName: "upgradesDone")!.contains(touch) {
-                hud.hudState = .initial
+                if gameState == .gameOver {
+                    restart()
+                } else {
+                    hud.hudState = .initial
+                }
             }
         default:
             break
         }
-
     }
 }

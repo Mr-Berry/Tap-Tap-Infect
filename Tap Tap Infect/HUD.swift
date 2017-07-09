@@ -31,7 +31,7 @@ enum HUDMessages {
 }
 
 enum HUDState: Int {
-    case initial = 0, buildingTapped, attackTapped, reset, upgrading, gameOver
+    case initial = 0, reset, upgrading, gameOver
 }
 
 class HUD: SKNode {
@@ -47,8 +47,10 @@ class HUD: SKNode {
     
     var upgradesMenu: SKShapeNode = SKShapeNode()
     
-    var zCountLabel: SKLabelNode?
-    var brainCountLabel: SKLabelNode?
+    var zCountLabel: SKLabelNode = SKLabelNode()
+    var brainCountLabel: SKLabelNode = SKLabelNode()
+    
+    let splatEmitter = SKEmitterNode(fileNamed: "Splat")
     
     var hudState: HUDState = .initial {
         didSet {
@@ -58,8 +60,6 @@ class HUD: SKNode {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        zCountLabel = childNode(withName: "ZombieCounter") as? SKLabelNode
-        brainCountLabel = childNode(withName: "BrainCounter") as? SKLabelNode
     }
     
     override init() {
@@ -90,25 +90,28 @@ class HUD: SKNode {
         return background
     }
     
-    func addZCount(zombies: Int) {
+    func addBrainCount(brains: Int) {
+        let position = CGPoint(x: brainCountButton!.position.x+32, y: brainCountButton!.position.y-8)
+        add(message: "BCounter:", position: position, fontSize: 34)
+        brainCountLabel = childNode(withName: "BCounter:") as! SKLabelNode
+        brainCountLabel.removeAllChildren()
+        brainCountLabel.fontName = "Menlo"
+        updateBrainCount(brains: brains)
+    }
+    
+    func addZCount() {
         let position = CGPoint(x: zCountButton!.position.x+32, y: zCountButton!.position.y-8)
-        add(message: "ZCounter:", position: position, fontSize: 34)
-        zCountLabel = childNode(withName: "ZCounter:") as? SKLabelNode
-        zCountLabel!.removeAllChildren()
-        zCountLabel!.fontName = "Menlo"
-        updateZombieCount(zombies: zombies)
+        zCountLabel = SKLabelNode(fontNamed: HUDSettings.largeFont)
+        zCountLabel.position = position
+        zCountLabel.fontColor = .white
+        zCountLabel.fontSize = 34
+        zCountLabel.zPosition = 100
+        zCountLabel.text = "0"
+        addChild(zCountLabel)
     }
 
     func clearUI(_ oldState: HUDState) {
         switch oldState {
-        case .initial:
-            break
-        case .buildingTapped:
-            break
-        case .attackTapped:
-            remove(message: HUDMessages.attack)
-            remove(message: HUDMessages.yesAttack)
-            remove(message: HUDMessages.no)
         case .reset:
             remove(message: HUDMessages.reset)
             remove(message: HUDMessages.resetText)
@@ -122,8 +125,8 @@ class HUD: SKNode {
     }
     
     func hideUpgradesMenu() {
-        let scale = SKAction.scale(to: 0, duration: 0.5)
-        let fade = SKAction.fadeOut(withDuration: 0.5)
+        let scale = SKAction.scale(to: 0, duration: 0.2)
+        let fade = SKAction.fadeOut(withDuration: 0.2)
         upgradesMenu.run(SKAction.group([scale,fade]))
     }
     
@@ -150,6 +153,8 @@ class HUD: SKNode {
         self.addChild(resetButton!)
         self.addChild(upgradesButton!)
         self.addChild(zCountButton!)
+        
+        addZCount()
     }
     
     func setupNodes(size: CGSize) {
@@ -159,39 +164,59 @@ class HUD: SKNode {
     
     func setupUpgradesMenu(size: CGSize) {
         let buttonSize = CGSize(width: size.height*0.4, height: size.width*0.4)
+        
         let button1 = SKShapeNode(rectOf: buttonSize)
         button1.fillTexture = SKTexture(imageNamed: "rpgTile133")
         button1.fillColor = .white
         button1.strokeColor = .clear
         button1.name = "upgradeButton1"
+        let b1text = SKLabelNode(fontNamed: HUDSettings.font)
+        b1text.text = "Zombie Upgrades Coming Soon"
+        b1text.fontSize = 10
+        button1.addChild(b1text)
+        
         let button2 = SKShapeNode(rectOf: buttonSize)
         button2.fillTexture = SKTexture(imageNamed: "rpgTile133")
         button2.fillColor = .white
         button2.strokeColor = .clear
         button2.name = "upgradeButton2"
+        let b2text = SKLabelNode(fontNamed: HUDSettings.font)
+        b2text.text = "General Upgrades Coming Soon"
+        b2text.fontSize = 10
+        button2.addChild(b2text)
+        
         let button3 = SKShapeNode(rectOf: CGSize(width: buttonSize.height*0.5, height: buttonSize.width*0.5))
         button3.fillTexture = SKTexture(imageNamed: "rpgTile133")
         button3.fillColor = .red
         button3.strokeColor = .clear
         button3.name = "upgradesDone"
+        let b3text = SKLabelNode(fontNamed: HUDSettings.font)
+        b3text.text = "Done"
+        b3text.fontSize = 30
+        b3text.position.y = -10
+        button3.addChild(b3text)
+        
         upgradesMenu = SKShapeNode(rectOf: CGSize(width: size.width*3, height: size.height*3))
-        upgradesMenu.fillTexture = SKTexture(imageNamed: "whitePuff10")
         upgradesMenu.fillColor = .black
         upgradesMenu.strokeColor = .clear
         upgradesMenu.zPosition = 110
         upgradesMenu.addChild(button1)
+        
         button1.position = CGPoint(x: -0.25*size.width, y: 0)
         upgradesMenu.addChild(button2)
+        
         button2.position = CGPoint(x: 0.25*size.width, y: 0)
         upgradesMenu.addChild(button3)
+        
         button3.position = CGPoint(x: 0, y: -1*buttonSize.width)
         addChild(upgradesMenu)
+        
         upgradesMenu.setScale(0)
     }
     
     func showUpgradesMenu() {
-        let scale = SKAction.scale(to: 1, duration: 0.5)
-        let fade = SKAction.fadeIn(withDuration: 0.5)
+        let scale = SKAction.scale(to: 1, duration: 0.2)
+        let fade = SKAction.fadeIn(withDuration: 0.2)
         upgradesMenu.run(SKAction.group([scale,fade]))
     }
     
@@ -202,15 +227,6 @@ class HUD: SKNode {
 
     func updateHUD(_ state: HUDState) {
         switch hudState {
-        case .initial:
-            
-            break
-        case .buildingTapped:
-            break
-        case .attackTapped:
-            add(message: HUDMessages.attack, position: .zero, fontSize: 40)
-            add(message: HUDMessages.yesAttack, position: CGPoint(x: -140, y: -100))
-            add(message: HUDMessages.no, position: CGPoint(x: 130, y: -100))
         case .reset:
             add(message: HUDMessages.reset, position: CGPoint(x: 0, y: 50), fontSize: 40)
             add(message: HUDMessages.resetText, position: .zero, fontSize: 20)
@@ -220,16 +236,18 @@ class HUD: SKNode {
             add(message: HUDMessages.gameOver, position: .zero, fontSize: 40)
         case .upgrading:
             showUpgradesMenu()
+        default:
+            break
         }
     }
     
     func updateZombieCount(zombies: Int) {
         let zCount = String("\(zombies)")
-        zCountLabel!.text = zCount
+        self.zCountLabel.text = zCount
     }
     
-    func updateBrainCount(brainz: Int) {
-        let bCount = String("\(brainz)")
-        zCountLabel!.text = bCount
+    func updateBrainCount(brains: Int) {
+        let bCount = String("\(brains)")
+        brainCountLabel.text = bCount
     }
 }

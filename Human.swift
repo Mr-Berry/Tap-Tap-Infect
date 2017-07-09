@@ -43,6 +43,7 @@ class Human {
     var isAlive: Bool = true
     var canTurn: Bool = true
     var wantsBrainz: Bool = false
+    var isScreaming: Bool = false
     
     var color = UIColor()
     
@@ -99,11 +100,11 @@ class Human {
     func chase(_ human: Human) {
         if isAlive && human.isAlive{
             shape.removeAction(forKey: "walk")
-            shape.removeAction(forKey: "run")
-            if shape.action(forKey: "chase") == nil {
+            if shape.action(forKey: "chase") == nil && shape.action(forKey: "run") == nil {
                 let offset = human.shape.position - shape.position
                 let direction = offset/offset.length()
-                let angle = direction.angle
+                let angle = CGFloat(shortestAngleBetween(shape.zRotation,
+                                                         angle2: direction.angle))
                 accent.run(SKAction.rotate(toAngle: angle, duration: 0.3))
                 let vector = CGVector(dx: 2*direction.x*speed, dy: 2*direction.y*speed)
                 let chase = SKAction.move(by: vector, duration: 1)
@@ -151,7 +152,6 @@ class Human {
         shape.alpha = 0
         shape.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(radius))
         shape.physicsBody?.restitution = 0.2
-        shape.physicsBody?.linearDamping = 0.5
         shape.physicsBody?.friction = 0
         shape.physicsBody?.allowsRotation = false
         accent.setScale(HumanSettings.scaleAmount)
@@ -160,15 +160,18 @@ class Human {
     }
     
     func moveToPoint(point: CGPoint) {
-        shape.removeAction(forKey: "walk")
-        shape.removeAction(forKey: "run")
+        shape.removeAllActions()
+//        shape.removeAction(forKey: "walk")
+//        shape.removeAction(forKey: "chase")
+//        shape.removeAction(forKey: "run")
         if !shape.hasActions() {
             let distance = point.length()
             let direction = point/distance
-            let angle = direction.angle
+            let angle = CGFloat(shortestAngleBetween(shape.zRotation,
+                                                     angle2: direction.angle))
             accent.run(SKAction.rotate(toAngle: angle, duration: 0.3))
-            let vector = CGVector(dx: 6*direction.x*speed, dy: 6*direction.y*speed)
-            let run = SKAction.move(by: vector, duration: 3)
+            let vector = CGVector(dx: 4*direction.x*speed, dy: 4*direction.y*speed)
+            let run = SKAction.move(by: vector, duration: 2)
             let clean = SKAction.run { self.shape.removeAction(forKey: "run")}
             shape.run(SKAction.sequence([run,clean,SKAction.run{ self.walk() }]), withKey: "run")
         }
@@ -206,7 +209,8 @@ class Human {
             if shape.action(forKey: "runAway") == nil{
                 let offset = zombiePosition - shape.position
                 let direction = offset/offset.length()
-                let angle = direction.angle
+                let angle = CGFloat(shortestAngleBetween(shape.zRotation,
+                                                         angle2: direction.angle))
                 accent.run(SKAction.rotate(toAngle: angle+π, duration: 0.3))
                 let vector = CGVector(dx: -2*direction.x*speed,
                                       dy: -2*direction.y*speed)
@@ -314,7 +318,8 @@ class Human {
             let vector = CGVector(dx: 2*direction.x*CGFloat(speed), dy: 2*direction.y*CGFloat(speed))
             let moveBy = SKAction.move(by: vector, duration: 2)
             let moveAgain = SKAction.run(walk)
-            let angle = direction.angle
+            let angle = CGFloat(shortestAngleBetween(shape.zRotation,
+                                                     angle2: direction.angle))
             accent.run(SKAction.rotate(toAngle: angle, duration: 0.3))
             shape.run(SKAction.sequence([moveBy, moveAgain]), withKey: "walk")
         }
