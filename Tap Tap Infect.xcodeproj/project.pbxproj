@@ -31,7 +31,6 @@
 		1DCD16AA1F11D09B0036A972 /* brains3.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1DCD16A71F11D09B0036A972 /* brains3.wav */; };
 		1DCD16AC1F11D0D30036A972 /* groan.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1DCD16AB1F11D0D30036A972 /* groan.wav */; };
 		1DCD16AE1F11D0EA0036A972 /* rar.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1DCD16AD1F11D0EA0036A972 /* rar.wav */; };
-		1DCE17FB1EFEEF5700554C4A /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCE17FA1EFEEF5700554C4A /* Extensions.swift */; };
 		1DCE17FD1EFEEF6000554C4A /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCE17FC1EFEEF6000554C4A /* Types.swift */; };
 		1DCE17FF1EFF514400554C4A /* HUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCE17FE1EFF514400554C4A /* HUD.swift */; };
 		1DDB06431EECC0B4002B0707 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDB06421EECC0B4002B0707 /* AppDelegate.swift */; };
@@ -77,7 +76,6 @@
 		1DCD16A71F11D09B0036A972 /* brains3.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = brains3.wav; sourceTree = "<group>"; };
 		1DCD16AB1F11D0D30036A972 /* groan.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = groan.wav; sourceTree = "<group>"; };
 		1DCD16AD1F11D0EA0036A972 /* rar.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rar.wav; sourceTree = "<group>"; };
-		1DCE17FA1EFEEF5700554C4A /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		1DCE17FC1EFEEF6000554C4A /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		1DCE17FE1EFF514400554C4A /* HUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HUD.swift; sourceTree = "<group>"; };
 		1DDB063F1EECC0B4002B0707 /* Tap Tap Infect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tap Tap Infect.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -176,19 +174,18 @@
 			children = (
 				1D25266C1EFC6E8100E21FE4 /* Scenes */,
 				1DBF7EA11F06FF3900E8CB83 /* Particles */,
-				1DDB06421EECC0B4002B0707 /* AppDelegate.swift */,
-				1D8FD2641EF5F39C00C29815 /* Human.swift */,
-				1DCE17FE1EFF514400554C4A /* HUD.swift */,
 				1DDB06461EECC0B4002B0707 /* Actions.sks */,
+				1DDB06421EECC0B4002B0707 /* AppDelegate.swift */,
+				1DDB064F1EECC0B4002B0707 /* Assets.xcassets */,
+				1D3C46E61F0B2B0200876582 /* Button.swift */,
 				1DDB06481EECC0B4002B0707 /* GameScene.swift */,
 				1DDB064A1EECC0B4002B0707 /* GameViewController.swift */,
-				1DDB064C1EECC0B4002B0707 /* Main.storyboard */,
-				1DDB064F1EECC0B4002B0707 /* Assets.xcassets */,
-				1DDB06511EECC0B4002B0707 /* LaunchScreen.storyboard */,
+				1DCE17FE1EFF514400554C4A /* HUD.swift */,
+				1D8FD2641EF5F39C00C29815 /* Human.swift */,
 				1DDB06541EECC0B4002B0707 /* Info.plist */,
-				1DCE17FA1EFEEF5700554C4A /* Extensions.swift */,
+				1DDB06511EECC0B4002B0707 /* LaunchScreen.storyboard */,
+				1DDB064C1EECC0B4002B0707 /* Main.storyboard */,
 				1DCE17FC1EFEEF6000554C4A /* Types.swift */,
-				1D3C46E61F0B2B0200876582 /* Button.swift */,
 			);
 			path = "Tap Tap Infect";
 			sourceTree = "<group>";
@@ -313,7 +310,6 @@
 				1D8FD2581EF5CB8100C29815 /* CGFloat+Extensions.swift in Sources */,
 				1D3C46E71F0B2B0200876582 /* Button.swift in Sources */,
 				1DDB064B1EECC0B4002B0707 /* GameViewController.swift in Sources */,
-				1DCE17FB1EFEEF5700554C4A /* Extensions.swift in Sources */,
 				1D8FD2651EF5F39C00C29815 /* Human.swift in Sources */,
 				1D8FD2601EF5CB8100C29815 /* SKTAudio.swift in Sources */,
 				1D8FD25F1EF5CB8100C29815 /* SKNode+Extensions.swift in Sources */,

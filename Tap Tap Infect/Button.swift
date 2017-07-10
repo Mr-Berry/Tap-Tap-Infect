@@ -20,21 +20,5 @@ class Button: SKSpriteNode{
 
     override init(texture: SKTexture?, color: UIColor, size: CGSize) {
         super.init(texture: texture, color: color, size: size)
-        setupTouchNode(size: size)
     }
-    
-    func setupTouchNode(size: CGSize) {
-        button = SKShapeNode(rectOf: size)
-        button.fillColor = .clear
-        button.strokeColor = .clear
-        self.addChild(button)
-    }
-    
-//    override func contains(_ point: CGPoint) -> Bool {
-//        var retVal = false
-//        if button.contains(point) {
-//            retVal = true
-//        }
-//        return retVal
-//    }
 }
