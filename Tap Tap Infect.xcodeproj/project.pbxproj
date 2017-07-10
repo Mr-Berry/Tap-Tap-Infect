@@ -44,6 +44,12 @@
 		1DDB06531EECC0B4002B0707 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1DDB06511EECC0B4002B0707 /* LaunchScreen.storyboard */; };
 		1DE48A881F0EED5B00244A88 /* Brainz.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1DE48A871F0EED5B00244A88 /* Brainz.sks */; };
 		1DE48A8A1F0EEF1500244A88 /* Shout.sks in Resources */ = {isa = PBXBuildFile; fileRef = 1DE48A891F0EEF1500244A88 /* Shout.sks */; };
+		1DF0AA3B1F13F42800072810 /* SeashorePeaceAmbiance.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1DF0AA3A1F13F42800072810 /* SeashorePeaceAmbiance.mp3 */; };
+		1DF0AA431F13F89D00072810 /* Monster-1.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1DF0AA3C1F13F89D00072810 /* Monster-1.wav */; };
+		1DF0AA441F13F89D00072810 /* Monster-2.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1DF0AA3D1F13F89D00072810 /* Monster-2.wav */; };
+		1DF0AA451F13F89D00072810 /* Monster-3.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1DF0AA3E1F13F89D00072810 /* Monster-3.wav */; };
+		1DF0AA4C1F13FC3000072810 /* reload.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1DF0AA4A1F13FC3000072810 /* reload.mp3 */; };
+		1DF0AA4F1F13FEBD00072810 /* shoot.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1DF0AA4E1F13FEBD00072810 /* shoot.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -86,6 +92,12 @@
 		1DDB06541EECC0B4002B0707 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1DE48A871F0EED5B00244A88 /* Brainz.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Brainz.sks; sourceTree = "<group>"; };
 		1DE48A891F0EEF1500244A88 /* Shout.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Shout.sks; sourceTree = "<group>"; };
+		1DF0AA3A1F13F42800072810 /* SeashorePeaceAmbiance.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = SeashorePeaceAmbiance.mp3; sourceTree = "<group>"; };
+		1DF0AA3C1F13F89D00072810 /* Monster-1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "Monster-1.wav"; sourceTree = "<group>"; };
+		1DF0AA3D1F13F89D00072810 /* Monster-2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "Monster-2.wav"; sourceTree = "<group>"; };
+		1DF0AA3E1F13F89D00072810 /* Monster-3.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "Monster-3.wav"; sourceTree = "<group>"; };
+		1DF0AA4A1F13FC3000072810 /* reload.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = reload.mp3; sourceTree = "<group>"; };
+		1DF0AA4E1F13FEBD00072810 /* shoot.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shoot.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,6 +196,12 @@
 		1DDB065B1EECC4B7002B0707 /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
+				1DF0AA4E1F13FEBD00072810 /* shoot.wav */,
+				1DF0AA4A1F13FC3000072810 /* reload.mp3 */,
+				1DF0AA3C1F13F89D00072810 /* Monster-1.wav */,
+				1DF0AA3D1F13F89D00072810 /* Monster-2.wav */,
+				1DF0AA3E1F13F89D00072810 /* Monster-3.wav */,
+				1DF0AA3A1F13F42800072810 /* SeashorePeaceAmbiance.mp3 */,
 				1DCD16A31F11D06B0036A972 /* zMusic.mp3 */,
 				1DCD16AD1F11D0EA0036A972 /* rar.wav */,
 				1DCD16AB1F11D0D30036A972 /* groan.wav */,
@@ -261,15 +279,21 @@
 				1DDB06451EECC0B4002B0707 /* GameScene.sks in Resources */,
 				1DCD16AA1F11D09B0036A972 /* brains3.wav in Resources */,
 				1DE48A8A1F0EEF1500244A88 /* Shout.sks in Resources */,
+				1DF0AA4C1F13FC3000072810 /* reload.mp3 in Resources */,
+				1DF0AA4F1F13FEBD00072810 /* shoot.wav in Resources */,
 				1DE48A881F0EED5B00244A88 /* Brainz.sks in Resources */,
+				1DF0AA3B1F13F42800072810 /* SeashorePeaceAmbiance.mp3 in Resources */,
 				1DDB06501EECC0B4002B0707 /* Assets.xcassets in Resources */,
 				1DCD16A81F11D09B0036A972 /* brains.wav in Resources */,
+				1DF0AA431F13F89D00072810 /* Monster-1.wav in Resources */,
+				1DF0AA441F13F89D00072810 /* Monster-2.wav in Resources */,
 				1DDB06531EECC0B4002B0707 /* LaunchScreen.storyboard in Resources */,
 				1DBF7EA51F06FF6E00E8CB83 /* Assets.xcassets in Resources */,
 				1DCD16AE1F11D0EA0036A972 /* rar.wav in Resources */,
 				1DCD16AC1F11D0D30036A972 /* groan.wav in Resources */,
 				1DCD16A41F11D06C0036A972 /* zMusic.mp3 in Resources */,
 				1DDB06471EECC0B4002B0707 /* Actions.sks in Resources */,
+				1DF0AA451F13F89D00072810 /* Monster-3.wav in Resources */,
 				1D3C46E51F0B147A00876582 /* DeathAnimation.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

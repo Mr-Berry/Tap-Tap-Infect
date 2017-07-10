@@ -51,6 +51,13 @@ class Human {
     var bullet: SKShapeNode = SKShapeNode()
     var accent: SKSpriteNode = SKSpriteNode()
     
+    let shootSound = SKAction.playSoundFileNamed("shoot.wav", waitForCompletion: false)
+    let reloadSound = SKAction.playSoundFileNamed("reload.mp3", waitForCompletion: false)
+    
+    let zAttackSound = [SKAction.playSoundFileNamed("Monster-1.wav", waitForCompletion: false),
+                       SKAction.playSoundFileNamed("Monster-2.wav", waitForCompletion: false),
+                       SKAction.playSoundFileNamed("Monster-3.wav", waitForCompletion: false)]
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -75,16 +82,8 @@ class Human {
     }
     
     func attack(human: Human) {
-        switch human.category {
-        case humanType.cop.rawValue:
-            human.takeDamage(damage)
-            break
-        case humanType.military.rawValue:
-            human.takeDamage(damage)
-            break
-        default:
-            human.takeDamage(damage)
-        }
+        human.takeDamage(damage)
+        playZattackSound()
     }
     
     func becomeZombie() {
@@ -106,8 +105,8 @@ class Human {
                 let angle = CGFloat(shortestAngleBetween(shape.zRotation,
                                                          angle2: direction.angle))
                 accent.run(SKAction.rotate(toAngle: angle, duration: 0.3))
-                let vector = CGVector(dx: 2*direction.x*speed, dy: 2*direction.y*speed)
-                let chase = SKAction.move(by: vector, duration: 1)
+                let vector = CGVector(dx: direction.x*speed, dy: direction.y*speed)
+                let chase = SKAction.move(by: vector, duration: 0.5)
                 let clean = SKAction.run { self.shape.removeAction(forKey: "chase")}
                 shape.run(SKAction.sequence([chase,clean,SKAction.run{ self.walk() }]), withKey: "chase")
             }
@@ -174,6 +173,20 @@ class Human {
             let run = SKAction.move(by: vector, duration: 2)
             let clean = SKAction.run { self.shape.removeAction(forKey: "run")}
             shape.run(SKAction.sequence([run,clean,SKAction.run{ self.walk() }]), withKey: "run")
+        }
+    }
+    
+    func playZattackSound() {
+        if shape.action(forKey: "shootSound") == nil {
+            let randomNum = Int.random(zAttackSound.count-1)
+            shape.run(SKAction.sequence([zAttackSound[randomNum],SKAction.run{self.shape.removeAction(forKey: "shootSound")}]), withKey: "shootSound")
+        }
+    }
+    
+    func playShootingSound() {
+        if shape.action(forKey: "shootSound") == nil {
+            let wait = SKAction.wait(forDuration: 0.4)
+            shape.run(SKAction.sequence([shootSound,wait,reloadSound,SKAction.run{self.shape.removeAction(forKey: "shootSound")}]), withKey: "shootSound")
         }
     }
     
@@ -273,15 +286,17 @@ class Human {
             if bullet.action(forKey: "shoot") == nil {
                 let offset = zombie.shape.position - shape.position
                 let direction = offset/offset.length()
-                let angle = direction.angle
-                accent.run(SKAction.rotate(toAngle: angle, duration: 0.2))
+                let angle = CGFloat(shortestAngleBetween(shape.zRotation,
+                                                         angle2: direction.angle))
+                accent.run(SKAction.rotate(toAngle: angle, duration: 0))
                 spawnBullet(direction: direction)
                 let travelTime = offset.length()/HumanSettings.bulletSpeed
                 let travel = SKAction.move(to: zombie.shape.position, duration: TimeInterval(travelTime))
                 let removeBullet = SKAction.fadeOut(withDuration: 0.1)
                 let clean = SKAction.run { self.shape.removeAction(forKey: "shoot")}
-                let wait = SKAction.wait(forDuration: 0.5)
+                let wait = SKAction.wait(forDuration: 1)
                 bullet.run(SKAction.sequence([travel,removeBullet,SKAction.run {                  zombie.takeDamage(self.damage) },wait,clean,SKAction.run{ self.walk() }]), withKey: "shoot")
+                playShootingSound()
             }
         }
     }

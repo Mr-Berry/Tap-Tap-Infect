@@ -5,6 +5,8 @@
 //  Created by Jason Patrick Berry on 2017-06-10.
 //  Copyright © 2017 Jason Patrick Berry. All rights reserved.
 //
+// Credits:
+// Peter Eastman: PeacefulScene.ogg
 
 import SpriteKit
 import GameplayKit
@@ -49,7 +51,7 @@ class GameScene: SKScene {
     var buildingsTileMap: [SKTileMapNode] = []
     var clouds: SKTileMapNode!
     
-    var numZTaps: Int = 5
+    var numZTaps: Int = 3
     var unlockedSpawns: Int = 3
     let cameraMoveSpeed: Float = 15.0
     var initialTouch: CGPoint = .zero
@@ -72,7 +74,7 @@ class GameScene: SKScene {
         setupEdgeLoop()
         createHumans()
         setupHudAndCamera()
-        playBackgroundMusic("zMusic.mp3")
+        playBackgroundMusic("SeashorePeaceAmbiance.mp3")
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -256,6 +258,7 @@ class GameScene: SKScene {
             backgroundMusic.removeFromParent()
         }
         let music = SKAudioNode(fileNamed: name)
+        music.name = "backgroundMusic"
         music.autoplayLooped = true
         addChild(music)
     }
@@ -438,6 +441,9 @@ class GameScene: SKScene {
             for i in 0...HumanPop.count-1 {
                 if endTouch != .zero {
                     if HumanPop[i].shape.contains(initialTouch) && HumanPop[i].shape.contains(endTouch){
+                        if ZombiePop.count == 0 {
+                            playBackgroundMusic("zMusic.mp3")
+                        }
                         convertHuman(human: HumanPop[i])
                         numZTaps -= 1
                         endTouch = .zero
