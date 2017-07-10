@@ -39,16 +39,21 @@ class HUD: SKNode {
     let resetTexture = SKTexture(imageNamed: "HUD_0")
     let upgradesTexture = SKTexture(imageNamed: "HUD_1")
     let zCountTexture = SKTexture(imageNamed: "HUD_2")
+    let bBankTexture = SKTexture(imageNamed: "HUD_3")
+    let bCountTexture = SKTexture(imageNamed: "HUD_4")
     
     var resetButton: Button?
     var upgradesButton: Button?
     var zCountButton: Button?
+    var brainBankButton: Button?
     var brainCountButton: Button?
     
     var upgradesMenu: SKShapeNode = SKShapeNode()
     
     var zCountLabel: SKLabelNode = SKLabelNode()
-    var brainCountLabel: SKLabelNode = SKLabelNode()
+    var brainBankLabel: SKLabelNode = SKLabelNode()
+    var bCountLabel: SKLabelNode = SKLabelNode()
+    var zTapLabel: SKLabelNode = SKLabelNode()
     
     let splatEmitter = SKEmitterNode(fileNamed: "Splat")
     
@@ -90,24 +95,51 @@ class HUD: SKNode {
         return background
     }
     
-    func addBrainCount(brains: Int) {
-        let position = CGPoint(x: brainCountButton!.position.x+32, y: brainCountButton!.position.y-8)
-        add(message: "BCounter:", position: position, fontSize: 34)
-        brainCountLabel = childNode(withName: "BCounter:") as! SKLabelNode
-        brainCountLabel.removeAllChildren()
-        brainCountLabel.fontName = "Menlo"
-        updateBrainCount(brains: brains)
+    func addBrainBank(brains: Int) {
+        let position = CGPoint(x: brainBankButton!.position.x+26, y: brainBankButton!.position.y-15)
+        brainBankLabel = SKLabelNode(fontNamed: HUDSettings.largeFont)
+        brainBankLabel.position = position
+        brainBankLabel.fontColor = .white
+        brainBankLabel.fontSize = 40
+        brainBankLabel.zPosition = 100
+        brainBankLabel.text = ":0"
+        addChild(brainBankLabel)
+        updateBrainBank(brains: brains)
+    }
+    
+    func addBrainCount() {
+        let position = CGPoint(x: brainCountButton!.position.x-16, y: brainCountButton!.position.y-15)
+        bCountLabel = SKLabelNode(fontNamed: HUDSettings.largeFont)
+        bCountLabel.position = position
+        bCountLabel.fontColor = .white
+        bCountLabel.fontSize = 40
+        bCountLabel.zPosition = 100
+        bCountLabel.text = "+0"
+        addChild(bCountLabel)
     }
     
     func addZCount() {
-        let position = CGPoint(x: zCountButton!.position.x+32, y: zCountButton!.position.y-8)
+        let position = CGPoint(x: zCountButton!.position.x+32, y: zCountButton!.position.y-15)
         zCountLabel = SKLabelNode(fontNamed: HUDSettings.largeFont)
         zCountLabel.position = position
         zCountLabel.fontColor = .white
-        zCountLabel.fontSize = 34
+        zCountLabel.fontSize = 40
         zCountLabel.zPosition = 100
-        zCountLabel.text = "0"
+        zCountLabel.text = ":0"
         addChild(zCountLabel)
+    }
+    
+    func addZTapLabel(numTaps: Int) {
+        let position = CGPoint(x: 0,
+                               y: -1*brainBankButton!.position.y-16)
+        zTapLabel = SKLabelNode(fontNamed: HUDSettings.largeFont)
+        zTapLabel.position = position
+        zTapLabel.fontColor = .white
+        zTapLabel.fontSize = 40
+        zTapLabel.zPosition = 50
+        zTapLabel.text = ":0"
+        addChild(zTapLabel)
+        updateZTap(numTaps: numTaps)
     }
 
     func clearUI(_ oldState: HUDState) {
@@ -119,6 +151,8 @@ class HUD: SKNode {
             remove(message: HUDMessages.no)
         case .upgrading:
             hideUpgradesMenu()
+        case .gameOver:
+            remove(message: HUDMessages.gameOver)
         default:
             break
         }
@@ -136,25 +170,39 @@ class HUD: SKNode {
     
     func setupButtons(size: CGSize) {
         resetButton = Button(texture: resetTexture, color: .clear, size: resetTexture.size())
-        resetButton!.position = CGPoint(x: 0, y: size.height*0.5+0.3*resetButton!.size.height)
+        resetButton!.position = CGPoint(x: 5, y: size.height*0.5+0.3*resetButton!.size.height)
         resetButton!.name = "reset"
-        resetButton!.zPosition = 100
+        resetButton!.zPosition = 99
         
         zCountButton = Button(texture: zCountTexture, color: .clear, size: zCountTexture.size())
         zCountButton!.position = CGPoint(x: size.width*0.5+0.3*zCountButton!.size.height-2, y: resetButton!.position.y-2)
         zCountButton!.name = "zCounter"
-        zCountButton!.zPosition = 100
+        zCountButton!.zPosition = 99
         
         upgradesButton = Button(texture: upgradesTexture, color: .clear, size: upgradesTexture.size())
         upgradesButton!.position = CGPoint(x: zCountButton!.position.x-0.8*upgradesButton!.size.width, y: resetButton!.position.y)
         upgradesButton!.name = "upgrades"
-        upgradesButton!.zPosition = 100
+        upgradesButton!.zPosition = 99
+        
+        brainBankButton = Button(texture: bBankTexture, color: .clear, size: bBankTexture.size())
+        brainBankButton!.position = CGPoint(x: -0.5*size.width-0.2*brainBankButton!.size.width,
+                                             y: resetButton!.position.y)
+        brainBankButton!.name = "bBank"
+        brainBankButton!.zPosition = 99
+        
+        brainCountButton = Button(texture: bCountTexture, color: .clear, size: bCountTexture.size())
+        brainCountButton!.position = CGPoint(x: brainBankButton!.position.x+0.9*brainCountButton!.size.width, y: resetButton!.position.y)
+        brainCountButton!.name = "bCounter"
+        brainCountButton!.zPosition = 99
     
         self.addChild(resetButton!)
         self.addChild(upgradesButton!)
         self.addChild(zCountButton!)
+        self.addChild(brainBankButton!)
+        self.addChild(brainCountButton!)
         
         addZCount()
+        addBrainCount()
     }
     
     func setupNodes(size: CGSize) {
@@ -170,6 +218,7 @@ class HUD: SKNode {
         button1.fillColor = .white
         button1.strokeColor = .clear
         button1.name = "upgradeButton1"
+        button1.zPosition = 1
         let b1text = SKLabelNode(fontNamed: HUDSettings.font)
         b1text.text = "Zombie Upgrades Coming Soon"
         b1text.fontSize = 10
@@ -180,6 +229,7 @@ class HUD: SKNode {
         button2.fillColor = .white
         button2.strokeColor = .clear
         button2.name = "upgradeButton2"
+        button2.zPosition = 1
         let b2text = SKLabelNode(fontNamed: HUDSettings.font)
         b2text.text = "General Upgrades Coming Soon"
         b2text.fontSize = 10
@@ -190,16 +240,21 @@ class HUD: SKNode {
         button3.fillColor = .red
         button3.strokeColor = .clear
         button3.name = "upgradesDone"
+        button3.zPosition = 1
         let b3text = SKLabelNode(fontNamed: HUDSettings.font)
         b3text.text = "Done"
         b3text.fontSize = 30
         b3text.position.y = -10
         button3.addChild(b3text)
         
+        let emitter = SKEmitterNode(fileNamed: "Splat")
+        emitter!.zPosition = 0
+        
         upgradesMenu = SKShapeNode(rectOf: CGSize(width: size.width*3, height: size.height*3))
-        upgradesMenu.fillColor = .black
+        upgradesMenu.fillColor = SKColorWithRGBA(25, g: 25, b: 25, a: 200)
         upgradesMenu.strokeColor = .clear
-        upgradesMenu.zPosition = 110
+        upgradesMenu.zPosition = 90
+        upgradesMenu.addChild(emitter!)
         upgradesMenu.addChild(button1)
         
         button1.position = CGPoint(x: -0.25*size.width, y: 0)
@@ -218,6 +273,16 @@ class HUD: SKNode {
         let scale = SKAction.scale(to: 1, duration: 0.2)
         let fade = SKAction.fadeIn(withDuration: 0.2)
         upgradesMenu.run(SKAction.group([scale,fade]))
+    }
+    
+    func updateBrainBank(brains: Int) {
+        let bCount = String(":\(brains)")
+        brainBankLabel.text = bCount
+    }
+    
+    func updateBrainCount(brains: Int) {
+        let bCount = String("+\(brains)")
+        self.bCountLabel.text = bCount
     }
     
     func updateHUDState(from: HUDState, to: HUDState) {
@@ -242,12 +307,12 @@ class HUD: SKNode {
     }
     
     func updateZombieCount(zombies: Int) {
-        let zCount = String("\(zombies)")
+        let zCount = String(":\(zombies)")
         self.zCountLabel.text = zCount
     }
     
-    func updateBrainCount(brains: Int) {
-        let bCount = String("\(brains)")
-        brainCountLabel.text = bCount
+    func updateZTap(numTaps: Int) {
+        let tapCount = String("number of infects left: \(numTaps)")
+        self.zTapLabel.text = tapCount
     }
 }

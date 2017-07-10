@@ -36,6 +36,7 @@ class GameScene: SKScene {
     var humansCount: Int = 0
     var destroyedCount: Int = 0
     var brains: Int = 0
+    static var brainsBanked: Int = 0
     
     var HumanPop: [Human] = []
     var ZombiePop: [Human] = []
@@ -80,9 +81,6 @@ class GameScene: SKScene {
         }
         initialTouch = touch.location(in: self)
         movedTouch = initialTouch
-        if hud.hudState == .gameOver {
-            restart()
-        }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -119,15 +117,14 @@ class GameScene: SKScene {
             deltaTime = 0
         }
         lastUpdateTimeInterval = currentTime
-        checkGameOver()
         updateHUD()
         playRandomSound()
-        if gameState == .overview {
-            setHumanSpawner()
-            updateHumansAndZombies()
-            cleanUp()
-        }
+        setHumanSpawner()
+        updateHumansAndZombies()
+        cleanUp()
         hud.updateZombieCount(zombies: ZombiePop.count)
+        hud.updateBrainCount(brains: brains)
+        hud.updateZTap(numTaps: numZTaps)
     }
     
     func buildingFlash(building: SKTileMapNode) {
@@ -152,12 +149,6 @@ class GameScene: SKScene {
         } else if hud.zCountButton!.contains(firstTouch) && hud.zCountButton!.contains(lastTouch){
             initialTouch = .zero
             endTouch = .zero
-        }
-    }
-    
-    func checkGameOver() {
-        if zombieCount == 0 && numZTaps == 0 && brains == 0 {
-            hud.hudState = .gameOver
         }
     }
     
@@ -407,6 +398,8 @@ class GameScene: SKScene {
         hud.setupNodes(size: view.frame.size)
         cameraNode.addChild(hud)
         hud.position = .zero
+        hud.addBrainBank(brains: GameScene.brainsBanked)
+        hud.addZTapLabel(numTaps: numZTaps)
 }
     
     func setupEdgeLoop() {
@@ -524,6 +517,11 @@ class GameScene: SKScene {
                 initialTouch = .zero
             }
         case .upgrading:
+            if gameState == .gameOver {
+                GameScene.brainsBanked += brains
+                hud.brainBankLabel.text = ":\(GameScene.brainsBanked+brains)"
+                brains = 0
+            }
             if hud.upgradesMenu.childNode(withName: "upgradesDone")!.contains(touch) {
                 if gameState == .gameOver {
                     restart()
